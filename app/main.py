@@ -2,11 +2,13 @@
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 from app.routers import auth
+from app.routers import monday_api
 import uvicorn
 import os
 app = FastAPI()
 
-app.include_router(auth.router)
+# app.include_router(auth.router)
+app.include_router(monday_api.router)
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 

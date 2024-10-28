@@ -10,6 +10,7 @@ router = APIRouter()
 
 @router.get("/auth/login")
 async def login(request: Request):
+    print("Requestssss",request)
     client_id = os.getenv("CLIENT_ID")
     redirect_uri = os.getenv("REDIRECT_URI")
     auth_url = "https://auth.monday.com/oauth2/authorize"
@@ -22,6 +23,7 @@ async def login(request: Request):
     }
 
     url = f"{auth_url}?{urllib.parse.urlencode(params)}"
+    print("url is here :", url)
     return RedirectResponse(url)
 
 # app/routers/auth.py (continued)
