@@ -7,7 +7,7 @@ import uvicorn
 import os
 app = FastAPI()
 
-# app.include_router(auth.router)
+app.include_router(auth.router)
 app.include_router(monday_api.router)
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))

@@ -1,43 +1,46 @@
 # app/routers/auth.py
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import RedirectResponse
-from sqlmodel.ext.asyncio.session import AsyncSession
-# from app.database import get_session
 import os
 import urllib.parse
+import json
+import httpx
+from google.cloud import firestore
 
 router = APIRouter()
 
+# Initialize Firestore client
+db = firestore.AsyncClient()
+
 @router.get("/auth/login")
-async def login(request: Request):
-    print("Requestssss",request)
+async def login(request: Request, openai_conversation_id: str):
     client_id = os.getenv("CLIENT_ID")
     redirect_uri = os.getenv("REDIRECT_URI")
     auth_url = "https://auth.monday.com/oauth2/authorize"
+
+    # Include openai_conversation_id in state to retain it across requests
+    state = json.dumps({"openai_conversation_id": openai_conversation_id})
 
     params = {
         "client_id": client_id,
         "redirect_uri": redirect_uri,
         "response_type": "code",
-        "state": "secure_random_state",
+        "state": state,
     }
 
     url = f"{auth_url}?{urllib.parse.urlencode(params)}"
-    print("url is here :", url)
     return RedirectResponse(url)
 
-# app/routers/auth.py (continued)
-import httpx
-# from app.utils.encryption import encrypt_token
-# from app.models import OAuthToken
-
 @router.get("/auth/callback")
-async def callback(request: Request, code: str, state: str ):
-    print("callback") ##add this when add db : session: AsyncSession = Depends(get_session)
-    if state != "secure_random_state":
-        # Handle invalid state parameter
-        return RedirectResponse("/error?message=Invalid state parameter")
+async def callback(request: Request, code: str, state: str):
+    try:
+        # Extract openai_conversation_id from state
+        state_data = json.loads(state)
+        openai_conversation_id = state_data["openai_conversation_id"]
+    except (json.JSONDecodeError, KeyError):
+        raise HTTPException(status_code=400, detail="Invalid state parameter")
 
+    # Token exchange
     token_url = "https://auth.monday.com/oauth2/token"
     client_id = os.getenv("CLIENT_ID")
     client_secret = os.getenv("CLIENT_SECRET")
@@ -52,23 +55,36 @@ async def callback(request: Request, code: str, state: str ):
 
     async with httpx.AsyncClient() as client:
         response = await client.post(token_url, data=data)
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Token exchange failed")
         token_data = response.json()
-    print("token",token_data)
-    if response.status_code != 200:
-        # Handle token exchange error
-        return RedirectResponse("/error?message=Token exchange failed")
 
-    # # Encrypt and store the token securely
-    # encrypted_token = encrypt_token(token_data["access_token"])
-    # token = OAuthToken(
-    #     user_id="unique_user_identifier",
-    #     access_token=encrypted_token,
-    #     expires_in=token_data.get("expires_in"),
-    #     token_type=token_data.get("token_type"),
-    #     scope=token_data.get("scope"),
-    #     refresh_token=token_data.get("refresh_token"),
-    # )
-    # session.add(token)
-    # await session.commit()
+    # Store the token in Firestore using openai_conversation_id as the document ID
+    await save_token_to_firestore(
+        openai_conversation_id=openai_conversation_id,
+        access_token=token_data["access_token"],
+        refresh_token=token_data.get("refresh_token"),
+        expires_in=token_data.get("expires_in"),
+        token_type=token_data.get("token_type"),
+        scope=token_data.get("scope"),
+    )
 
     return RedirectResponse("/dashboard")
+
+# Helper function to save the token in Firestore
+async def save_token_to_firestore(openai_conversation_id: str, access_token: str, refresh_token: str, expires_in: int, token_type: str, scope: str):
+    token_data = {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "expires_in": expires_in,
+        "token_type": token_type,
+        "scope": scope,
+        "created_at": firestore.SERVER_TIMESTAMP  # Automatically sets the server timestamp
+    }
+    
+    # Save to Firestore under the `tokens` collection, using openai_conversation_id as the document ID
+    try:
+        doc_ref = db.collection("tokens").document(openai_conversation_id)
+        await doc_ref.set(token_data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save token: {e}")

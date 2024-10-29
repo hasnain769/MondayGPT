@@ -25,14 +25,16 @@ query {
 }
 """
 @router.get("/monday/boards", tags=["monday"])
-async def get_board_details(access_token: str = Header(..., description="Access token for Monday.com API in the format 'Bearer <token>'")):
-    # Verify access token presence
-    if not access_token.startswith("Bearer "):
+async def get_board_details(
+    authorization: str = Header(..., alias="Authorization", description="Bearer token for Monday.com API")
+):
+    # Check if the header is in the format 'Bearer <token>'
+    if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid or missing access token. Expected format: 'Bearer <token>'")
 
-    # Set headers with the provided access token
+    # Prepare headers with the valid token
     headers = {
-        "Authorization": access_token,
+        "Authorization": authorization,
         "Content-Type": "application/json",
     }
 
