@@ -6,14 +6,24 @@ import urllib.parse
 import json
 import httpx
 from google.cloud import firestore
+from dotenv import load_dotenv  # Import to load .env file
 
 router = APIRouter()
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize Firestore client
 db = firestore.AsyncClient()
 
 @router.get("/auth/login")
-async def login(request: Request, openai_conversation_id: str):
+async def login(request: Request):
+    # Extract the openai_conversation_id from the request headers
+    openai_conversation_id = request.headers.get("openai-conversation-id")
+    print("----Openai converstation id: ",openai_conversation_id)
+    if not openai_conversation_id:
+        raise HTTPException(status_code=400, detail="Missing openai-conversation-id in headers.")
+
     client_id = os.getenv("CLIENT_ID")
     redirect_uri = os.getenv("REDIRECT_URI")
     auth_url = "https://auth.monday.com/oauth2/authorize"
@@ -29,10 +39,12 @@ async def login(request: Request, openai_conversation_id: str):
     }
 
     url = f"{auth_url}?{urllib.parse.urlencode(params)}"
+    print("Url : ",url)
     return RedirectResponse(url)
 
 @router.get("/auth/callback")
 async def callback(request: Request, code: str, state: str):
+    print("----state----: ",state)
     try:
         # Extract openai_conversation_id from state
         state_data = json.loads(state)
