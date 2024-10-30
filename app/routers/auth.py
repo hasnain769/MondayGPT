@@ -7,6 +7,7 @@ import json
 import httpx
 from google.cloud import firestore
 from dotenv import load_dotenv  # Import to load .env file
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
@@ -16,7 +17,41 @@ load_dotenv()
 # Initialize Firestore client
 db = firestore.AsyncClient()
 
-@router.get("/auth/login")
+@router.get("/auth/login",responses={
+        302: {
+            "description": "Redirects to the Monday.com OAuth2 authorization page.",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "detail": {
+                                "type": "string",
+                                "example": "Redirecting to the authorization page."
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        400: {
+            "description": "Bad Request due to missing headers.",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "detail": {
+                                "type": "string",
+                                "example": "Missing openai-conversation-id in headers."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+)
 async def login(request: Request):
     # Extract the openai_conversation_id from the request headers
     openai_conversation_id = request.headers.get("openai-conversation-id")
@@ -39,8 +74,10 @@ async def login(request: Request):
     }
 
     url = f"{auth_url}?{urllib.parse.urlencode(params)}"
-    print("Url : ",url)
-    return RedirectResponse(url)
+    print("Url: ", url)
+    
+    # Return the URL in a JSON response
+    return JSONResponse(content={"url": url})
 
 @router.get("/auth/callback")
 async def callback(request: Request, code: str, state: str):
@@ -70,7 +107,8 @@ async def callback(request: Request, code: str, state: str):
         if response.status_code != 200:
             raise HTTPException(status_code=400, detail="Token exchange failed")
         token_data = response.json()
-
+        
+        print("Acces token",token_data["access_token"])
     # Store the token in Firestore using openai_conversation_id as the document ID
     await save_token_to_firestore(
         openai_conversation_id=openai_conversation_id,
@@ -81,7 +119,7 @@ async def callback(request: Request, code: str, state: str):
         scope=token_data.get("scope"),
     )
 
-    return RedirectResponse("/dashboard")
+    return 
 
 # Helper function to save the token in Firestore
 async def save_token_to_firestore(openai_conversation_id: str, access_token: str, refresh_token: str, expires_in: int, token_type: str, scope: str):

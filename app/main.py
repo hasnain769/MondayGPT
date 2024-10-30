@@ -1,35 +1,27 @@
 # app/main.py
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse  # Import JSONResponse
-from starlette.middleware.sessions import SessionMiddleware
-from app.routers import auth
-from app.routers import monday_api
-from app.middleware.auth_middleware import AuthMiddleware
+from app.routers import auth, monday_api
 import uvicorn
 import os
 
-app = FastAPI()
+app = FastAPI(
+    title="MondayGPT app backend",
+    version="0.0.2",
+    servers=[{
+        "url": "",
+        "description": "Backend server for Monday GPT to authorize users"
+    }]
+)
 
-# Add AuthMiddleware
-app.add_middleware(AuthMiddleware)
-
-# Include your routers
+# Include other routers as usual
 app.include_router(auth.router)
-app.include_router(monday_api.router)
 
-# Add session middleware
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
+# Include the monday_app with middleware as a sub-application for /monday routes
+app.mount("/monday", monday_api.monday_app)
 
-@app.get("/")
-async def hello():
-    return {"message": "hello"}
-
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    return JSONResponse(
-        status_code=500,
-        content={"message": "An unexpected error occurred. Please try again later."},
-    )
+# @app.get("/")
+# async def hello():
+#     return {"message": "hello"}
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
