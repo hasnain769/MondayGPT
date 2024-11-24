@@ -1,8 +1,10 @@
 # app/main.py
 from fastapi import FastAPI
-from app.routers import auth, monday_api
+from app.routers.monday_app import monday_api
 import uvicorn
 import os
+
+from app.routers.auth import auth
 
 app = FastAPI(
     title="MondayGPT app backend",
