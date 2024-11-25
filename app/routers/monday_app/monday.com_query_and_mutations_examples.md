@@ -1,188 +1,3 @@
- # Table of Contents
-- [2023-10 Changes from 2023-07](#2023-10-changes-from-2023-07)
-  - Breaking changes:
-    - [Removed deprecated items field on boards queries](#removed-the-deprecated-items-field-on-boards-queries)
-    - [New column values fields and typed column values](#new-column-values-fields-and-typed-column-values)
-    - [Removed deprecated items_by_column_values and items_by_multiple_column_values](#removed-the-deprecated-items_by_column_values-and-items_by_multiple_column_values)
-    - [Required column_type for create_column mutation](#required-column_type-for-create_column-mutation)
-    - [Empty parentheses no longer supported](#empty-parentheses-no-longer-supported)
-    - [Quotation marks for strings required](#quotation-marks-for-strings-required)
-    - [Removed deprecated pos fields](#removed-deprecated-pos-fields)
-    - [Changed type field on columns queries](#changed-type-field-on-columns-queries)
-    - [Deprecated newest_first argument on boards queries](#deprecated-newest_first-argument-on-boards-queries)
-    - [ID arguments/fields type changes](#id-argumentsfields-type-changes)
-    - [Text field empty value for mirror, dependency, and connect boards columns](#text-field-empty-value-for-mirror-dependency-and-connect-boards-columns)
-  - Non-breaking changes:
-    - [New move_item_to_board mutation](#new-move_item_to_board-mutation)
-    - [New linked_items field on items queries](#new-linked_items-field-on-items-queries)
-    - [New edit_update and delete_update webhooks](#new-edit_update-and-delete_update-webhooks)
-    - [Nullable value argument in change_simple_column_value mutation](#nullable-value-argument-in-change_simple-column-value-mutation)
-    - [Increased complexity for text field](#increased-complexity-for-text-field)
-
-- [Monday.com GraphQL CRUD Operation Examples](#monday.com-graphql-crud-operation-examples)
-- [1. Check Complexity Points Usage](#1.-check-complexity-points-usage)
-  - [Query](#query)
-- [2. Update Simple Column Value](#2.-update-simple-column-value)
-  - [Mutation](#mutation)
-- [3. Update Complex Column Value](#3.-update-complex-column-value)
-  - [Mutation](#mutation)
-
-- [4. Upload a File to a Files Column](#4.-upload-a-file-to-a-files-column)
-  - [Mutation](#mutation)
-  - [Form Data (for file upload)](#form-data-(for-file-upload))
-- [5. Upload a File to an Update](#5.-upload-a-file-to-an-update)
-  - [Mutation](#mutation)
-  - [Form Data (for file upload)](#form-data-(for-file-upload))
-- [6. Create a Notification](#6.-create-a-notification)
-  - [Mutation](#mutation)
-- [7. Create an Item](#7.-create-an-item)
-  - [Mutation](#mutation)
-- [8. Create an Item (Using Variables)](#8.-create-an-item-(using-variables))
-  - [Mutation](#mutation)
-  - [Variables](#variables)
-- [9. Create an Item with Column Values](#9.-create-an-item-with-column-values)
-  - [Mutation](#mutation)
-- [10. Retrieve Account Details](#10.-retrieve-account-details)
-  - [Query](#query)
-- [11. List Board Details](#11.-list-board-details)
-  - [Query](#query)
-- [12. Create an Item with Detailed Column Values](#12.-create-an-item-with-detailed-column-values)
-  - [Mutation](#mutation)
-- [13. Create a Board](#13.-create-a-board)
-  - [Mutation](#mutation)
-- [14. Create a Column](#14.-create-a-column)
-  - [Mutation](#mutation)
-- [15. Create a Group](#15.-create-a-group)
-  - [Mutation](#mutation)
-- [16. Create a Subitem](#16.-create-a-subitem)
-  - [Mutation](#mutation)
-- [17. Create a Subitem (Using Variables)](#17.-create-a-subitem-(using-variables))
-  - [Mutation](#mutation)
-  - [Variables](#variables)
-- [18. Create a Workspace](#18.-create-a-workspace)
-  - [Mutation](#mutation)
-- [19. Check a Checkbox](#19.-check-a-checkbox)
-  - [Mutation](#mutation)
-- [20. Uncheck a Checkbox](#20.-uncheck-a-checkbox)
-  - [Mutation](#mutation)
-- [21. Change a Connect Boards Column](#21.-change-a-connect-boards-column)
-  - [Mutation](#mutation)
-- [22. Change a Country Column](#22.-change-a-country-column)
-  - [Mutation](#mutation)
-- [23. Change a Date Column](#23.-change-a-date-column)
-  - [Mutation](#mutation)
-- [24. Change a Dropdown Column](#24.-change-a-dropdown-column)
-  - [Mutation](#mutation)
-- [25. Change an Email Column](#25.-change-an-email-column)
-  - [Mutation](#mutation)
-- [26. Change an Hour Column](#26.-change-an-hour-column)
-  - [Mutation](#mutation)
-- [27. Change an Item's Name](#27.-change-an-item's-name)
-  - [Mutation](#mutation)
-- [28. Change a Link Column](#28.-change-a-link-column)
-  - [Mutation](#mutation)
-- [29. Change a Location Column](#29.-change-a-location-column)
-  - [Mutation](#mutation)
-- [30. Change a Long Text Column](#30.-change-a-long-text-column)
-  - [Mutation](#mutation)
-- [31. Change a Numbers Column](#31.-change-a-numbers-column)
-  - [Mutation](#mutation)
-- [32. Change a People Column](#32.-change-a-people-column)
-  - [Mutation](#mutation)
-- [33. Change a Phone Column](#33.-change-a-phone-column)
-  - [Mutation](#mutation)
-- [34. Change a Rating Column](#34.-change-a-rating-column)
-  - [Mutation](#mutation)
-- [35. Change a Status Column](#35.-change-a-status-column)
-  - [Mutation](#mutation)
-- [36. Change a Tags Column](#36.-change-a-tags-column)
-  - [Mutation](#mutation)
-- [37. Change a Text Column](#37.-change-a-text-column)
-  - [Mutation](#mutation)
-- [38. Change a Timeline Column](#38.-change-a-timeline-column)
-  - [Mutation](#mutation)
-- [39. Change a Week Column](#39.-change-a-week-column)
-  - [Mutation](#mutation)
-- [40. Change a World Clock Column](#40.-change-a-world-clock-column)
-  - [Mutation](#mutation)
-- [41. Clear a Text Column](#41.-clear-a-text-column)
-  - [Mutation](#mutation)
-- [42. Clear a Numbers Column](#42.-clear-a-numbers-column)
-  - [Mutation](#mutation)
-- [43. Clear a Files Column](#43.-clear-a-files-column)
-  - [Mutation](#mutation)
-- [44. Clear a Connect Boards Column](#44.-clear-a-connect-boards-column)
-  - [Mutation](#mutation)
-- [45. Clear a Dependency Column](#45.-clear-a-dependency-column)
-  - [Mutation](#mutation)
-- [46. Clear a Status Column](#46.-clear-a-status-column)
-  - [Mutation](#mutation)
-- [47. Clear a People Column](#47.-clear-a-people-column)
-  - [Mutation](#mutation)
-- [48. Get Specific Values in Column Values for a Location Column](#48.-get-specific-values-in-column-values-for-a-location-column)
-  - [Query](#query)
-- [49. Get Specific Values in Column Values for a Status Column](#49.-get-specific-values-in-column-values-for-a-status-column)
-  - [Query](#query)
-- [50. Get Specific Values in Column Values for a Checkbox Column](#50.-get-specific-values-in-column-values-for-a-checkbox-column)
-  - [Query](#query)
-- [51. Get Specific Values in Column Values for a Connect Boards Column](#51.-get-specific-values-in-column-values-for-a-connect-boards-column)
-  - [Query](#query)
-- [52. Get Specific Values in Column Values for a Country Column](#52.-get-specific-values-in-column-values-for-a-country-column)
-  - [Query](#query)
-- [53. Get Specific Values in Column Values for a Date Column](#53.-get-specific-values-in-column-values-for-a-date-column)
-  - [Query](#query)
-- [54. Get Specific Values in Column Values for a Dependency Column](#54.-get-specific-values-in-column-values-for-a-dependency-column)
-  - [Query](#query)
-- [55. Get Specific Values in Column Values for a Dropdown Column](#55.-get-specific-values-in-column-values-for-a-dropdown-column)
-  - [Query](#query)
-- [56. Get Specific Values in Column Values for an Email Column](#56.-get-specific-values-in-column-values-for-an-email-column)
-  - [Query](#query)
-- [57. Get Specific Values in Column Values for an Hour Column](#57.-get-specific-values-in-column-values-for-an-hour-column)
-  - [Query](#query)
-- [58. Get Specific Values in Column Values for a Link Column](#58.-get-specific-values-in-column-values-for-a-link-column)
-  - [Query](#query)
-- [59. Get Specific Values in Column Values for a Long Text Column](#59.-get-specific-values-in-column-values-for-a-long-text-column)
-  - [Query](#query)
-- [60. Get Specific Values in Column Values for a Monday Doc Column](#60.-get-specific-values-in-column-values-for-a-monday-doc-column)
-  - [Query](#query)
-- [61. Get Specific Values in Column Values for a Numbers Column](#61.-get-specific-values-in-column-values-for-a-numbers-column)
-  - [Query](#query)
-- [62. Get Specific Values in Column Values for a People Column](#62.-get-specific-values-in-column-values-for-a-people-column)
-  - [Query](#query)
-- [63. Get Specific Values in Column Values for a Phone Column](#63.-get-specific-values-in-column-values-for-a-phone-column)
-  - [Query](#query)
-- [64. Get Specific Values in Column Values for a Status Column](#64.-get-specific-values-in-column-values-for-a-status-column)
-  - [Query](#query)
-- [65. Using items_page with Query Parameters](#65.-using-items_page-with-query-parameters)
-  - [Query](#query)
-- [66. Using next_items_page](#66.-using-next_items_page)
-  - [Query](#query)
-- [67. Using items_page](#67.-using-items_page)
-  - [Query](#query)
-- [68. Using items_page_by_column_values](#68.-using-items_page_by_column_values)
-  - [Query](#query)
-- [69. Move an Item to a Different Board](#69.-move-an-item-to-a-different-board)
-  - [Mutation](#mutation)
-- [70. Get Items Linked to a Specific Item](#70.-get-items-linked-to-a-specific-item)
-  - [Query](#query)
-- [71. Clear Column Values](#71.-clear-column-values)
-  - [Mutation](#mutation)
-- [72. Get Specific Values in Column Values for a Rating Column](#72.-get-specific-values-in-column-values-for-a-rating-column)
-  - [Query](#query)
-- [73. Get Specific Values in Column Values for a Tags Column](#73.-get-specific-values-in-column-values-for-a-tags-column)
-  - [Query](#query)
-- [74. Get Specific Values in Column Values for a Text Column](#74.-get-specific-values-in-column-values-for-a-text-column)
-  - [Query](#query)
-- [75. Get Specific Values in Column Values for a Timeline Column](#75.-get-specific-values-in-column-values-for-a-timeline-column)
-  - [Query](#query)
-- [76. Get Specific Values in Column Values for a Week Column](#76.-get-specific-values-in-column-values-for-a-week-column)
-  - [Query](#query)
-- [77. Create a Tag](#77.-create-a-tag)
-  - [Mutation](#mutation)
-- [78. Create an Update](#78.-create-an-update)
-  - [Mutation](#mutation)
-- [79. Create a Webhook](#79.-create-a-webhook)
-  - [Mutation](#mutation)
 
 2023-10 changes from 2023-07
 
@@ -334,8 +149,6 @@ mutation {
 }
 ```
 
-### error
- 
 ### 4. **Upload a File to a Files Column**
 
 This mutation uploads a file to a specific files column within an item.
@@ -361,23 +174,13 @@ mutation add_file($file: File!) {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
-      }
-    ]
+    "add_file_to_column": {
+      "id": "1234567890"
+    }
   }
 }
 ```
 
-### error
 
 ### 5. **Upload a File to an Update**
 
@@ -404,20 +207,12 @@ mutation ($file: File!) {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
-      }
-    ]
+    "add_file_to_update": {
+      "id": "1234567890"
+    }
   }
 }
+
 ```
 ### 6. **Create a Notification**
 
@@ -805,7 +600,6 @@ mutation {
 ```
 ---
 
-### error
 
 ### 17. **Create a Subitem (Using Variables)**
 
@@ -837,20 +631,15 @@ mutation createSubitem($parentId: Int!, $name: String!) {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
+    "create_subitem": {
+      "id": "9876543",
+      "board": {
+        "id": "1234567890"
       }
-    ]
+    }
   }
 }
+
 ```
 
 
@@ -945,7 +734,6 @@ mutation {
 ```
 ---
 
-### error
 
 ### 21. **Change a Connect Boards Column**
 
@@ -967,20 +755,12 @@ mutation {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
-      }
-    ]
+    "change_multiple_column_values": {
+      "id": "1234567890"
+    }
   }
 }
+
 ```
 ---
 
@@ -1041,7 +821,7 @@ mutation {
 }
 ```
 ---
-###error
+
 
 ### 24. **Change a Dropdown Column**
 
@@ -1062,37 +842,18 @@ mutation {
 }
 ```
 
----
 
-
-⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
-mutation {
-  change_multiple_column_values(
-    item_id: 1234567890,
-    board_id: 1122334455,
-    column_values: "{\"connect_boards\": {}}"
-  ) {
-    id
-  }
-}
 #### Response Template
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
-      }
-    ]
+    "change_simple_column_value": {
+      "id": "1234567890"
+    }
   }
 }
+
+
 ```
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
@@ -1323,20 +1084,12 @@ mutation {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
-      }
-    ]
+    "change_multiple_column_values": {
+      "id": "11111"
+    }
   }
 }
+
 ```
 ---
 
@@ -1778,7 +1531,7 @@ mutation {
 }
 ```
 ---
-### error
+
 
 ### 48. **Get Specific Values in Column Values for a Location Column**
 
@@ -1802,20 +1555,25 @@ query {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
+    "items": [
       {
-        "id": "1234567890",
-        "name": "Board Name"
+        "column_values": [
+          {
+            "country": "United States",
+            "street": "Broadway",
+            "street_number": "123"
+          },
+          {
+            "country": "Canada",
+            "street": "King Street",
+            "street_number": "456"
+          }
+        ]
       }
     ]
   }
 }
+
 ```
 ---
 
@@ -1979,7 +1737,7 @@ query {
 }
 ```
 ---
-### error
+
 
 ### 50. **Get Specific Values in Column Values for a Checkbox Column**
 
@@ -2005,82 +1763,25 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "checked": false,
             "updated_at": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "checked": false,
-            "updated_at": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "checked": true,
+            "updated_at": "2024-11-24T12:00:00Z"
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2122,7 +1823,7 @@ query {
 ```
 ---
 
-### Error
+
 ### 52. **Get Specific Values in Column Values for a Country Column**
 
 This query retrieves country details and the last update time for a country column.
@@ -2144,20 +1845,27 @@ query {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
+    "items": [
       {
-        "id": "1234567890",
-        "name": "Board Name"
+        "column_values": [
+          {
+            "country": "United States",
+            "updated_at": "2024-11-25T12:00:00Z"
+          }
+        ]
+      },
+      {
+        "column_values": [
+          {
+            "country": "Canada",
+            "updated_at": "2024-11-24T15:30:00Z"
+          }
+        ]
       }
     ]
   }
 }
+
 ```
 
 ### 53. **Get Specific Values in Column Values for a Date Column**
@@ -2184,82 +1892,25 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "time": "23:00",
             "date": "1993-08-27"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "time": "",
             "date": ""
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2287,82 +1938,25 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "time": "23:00",
-            "date": "1993-08-27"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "linked_item_ids": [987654321, 123456789],
+            "updated_at": "2024-11-25T12:00:00Z"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "time": "",
-            "date": ""
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "linked_item_ids": [1122334455],
+            "updated_at": "2024-11-24T15:30:00Z"
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2394,17 +1988,6 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "values": [
               {
@@ -2417,70 +2000,24 @@ query {
             "column": {
               "id": "dropdown__1"
             }
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "values": [],
             "column": {
               "id": "dropdown__1"
             }
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2508,82 +2045,36 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "email": "example@example.com",
-            "updated_at": "2024-11-19T13:32:57+00:00"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "values": [
+              {
+                "id": "0"
+              },
+              {
+                "id": "1"
+              }
+            ],
+            "column": {
+              "id": "dropdown__1"
+            }
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "email": null,
-            "updated_at": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "values": [],
+            "column": {
+              "id": "dropdown__1"
+            }
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2611,82 +2102,25 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "minute": null,
-            "hour": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "email": "example@example.com",
+            "updated_at": "2024-11-19T13:32:57+00:00"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "minute": 42,
-            "hour": 16
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "email": null,
+            "updated_at": null
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2714,82 +2148,25 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "url": null,
             "url_text": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "url": "http://monday.com",
             "url_text": "go to monday!"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2820,82 +2197,25 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "text": "",
             "value": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
             "text": "Sample text",
             "value": "{\"text\":\"Sample text\",\"changed_at\":\"2024-11-19T13:43:36.060Z\"}"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -2925,76 +2245,29 @@ query {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          {
+            "file": {
+              "creator_id": "12345",
+              "url": "https://example.com/file.pdf"
+            }
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          {
+            "file": {
+              "creator_id": "67890",
+              "url": "https://example.com/another_file.pdf"
+            }
+          }
         ]
       }
     ]
   },
   "account_id": 25228442
 }
+
 ```
 ---
 
@@ -4331,4 +3604,3 @@ mutation {
 }
 ```
 ---
-
