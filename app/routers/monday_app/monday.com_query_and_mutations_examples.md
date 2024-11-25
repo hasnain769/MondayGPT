@@ -1,4 +1,3 @@
-
 2023-10 changes from 2023-07
 
 Breaking changes:
@@ -337,7 +336,6 @@ mutation {
 ```
 ---
 
-### error
 
 ### 10. **Retrieve Account Details**
 
@@ -361,20 +359,18 @@ query {
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
+    "account": {
+      "id": "25228442",
+      "name": "Example Company",
+      "country_code": "US",
+      "active_members_count": 25,
+      "plan": {
+        "name": "Pro"
       }
-    ]
+    }
   }
 }
+
 ```
 ---
 
