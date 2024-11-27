@@ -1,53 +1,158 @@
-2023-10 changes from 2023-07
+# RAG Document for Monday.com GraphQL CRUD Operations
 
-Breaking changes:
-
-1. Removed the deprecated items field on boards queries, replaced it with items_page (https://developer.monday.com/api-reference/changelog/removing-the-deprecated-items-field-on-boards-queries-replace-with-items-page)
-
-2. New column values fields and typed column values (https://developer.monday.com/api-reference/changelog/new-column-values-fields-and-typed-column-values)
-
-3. Removed the deprecated items_by_column_values and items_by_multiple_column_values objects, replaced them with items_page_by_column_values (https://developer.monday.com/api-reference/changelog/deprecating-items_by_column_values-and-items_by_multiple_column_values)
-
-4. The column_type field on the create_column mutation is now a required field (https://developer.monday.com/api-reference/changelog/required-column_type-argument-for-create_column-mutation)
-
-5. Empty parentheses are no longer supported (https://developer.monday.com/api-reference/changelog/empty-parentheses-no-longer-supported)
-
-6. Quotation marks for strings are now required (https://developer.monday.com/api-reference/changelog/quotation-marks-for-strings-required)
-
-7. Removed the deprecated pos fields on boards and columns queries (https://developer.monday.com/api-reference/changelog/removing-deprecated-pos-fields)
-
-8. The type field on columns queries has changed from String! to ColumnType! (https://developer.monday.com/api-reference/changelog/type-change-for-type-field-on-columns-queries)
-
-9. Deprecated the newest_first argument on boards queries (https://developer.monday.com/api-reference/changelog/deprecating-the-newest_first-argument)
-
-10. Many of the ID arguments and fields have changed from Int to ID type (https://developer.monday.com/api-reference/changelog/type-change-for-id-arguments-and-fields)
-
-11. Text field returns empty results for mirror, dependency, and connect boards columns (https://developer.monday.com/api-reference/changelog/text-field-empty-value-for-mirror-dependency-and-connect-boards-columns)
-
-Non-breaking changes:
-
-1. New move_item_to_board mutation (https://developer.monday.com/api-reference/changelog/new-move_item_to_board-mutation)
-
-2. New linked_items field on items queries (https://developer.monday.com/api-reference/changelog/new-linked_items-field)
-
-3. New edit_update and delete_update webhooks (https://developer.monday.com/api-reference/changelog/new-edit_update-and-delete-update-webhooks)
-
-4. The value argument in the change_simple_column_value mutation is now nullable (https://developer.monday.com/api-reference/changelog/nullable-value-argument-in-change-simple-column-value-mutation)
-
-5. The complexity of the text field for mirror, link, and dependency columns increased (https://developer.monday.com/api-reference/changelog/increased-complexity-for-text-field)
-
-
-Here's the updated document with a response template included for each operation. You can use these templates to copy and paste responses from Postman into the document.
+This document provides templates and guidelines for performing CRUD operations using Monday.com's GraphQL API. Variables that need to be customized are enclosed in double curly braces `{{ }}` for easy identification and modification.
 
 ---
 
-## Monday.com GraphQL CRUD Operation Examples
+## Table of Contents
 
-### 1. **Check Complexity Points Usage**
+1. [Check Complexity Points Usage](#1-check-complexity-points-usage)
+2. [Update Simple Column Value](#2-update-simple-column-value)
+3. [Update Complex Column Value](#3-update-complex-column-value)
+4. [Upload a File to a Files Column](#4-upload-a-file-to-a-files-column)
+5. [Upload a File to an Update](#5-upload-a-file-to-an-update)
+6. [Create a Notification](#6-create-a-notification)
+7. [Create an Item](#7-create-an-item)
+8. [Create an Item (Using Variables)](#8-create-an-item-using-variables)
+9. [Create an Item with Column Values](#9-create-an-item-with-column-values)
+10. [Retrieve Account Details](#10-retrieve-account-details)
+11. [List Board Details](#11-list-board-details)
+12. [Create an Item with Detailed Column Values](#12-create-an-item-with-detailed-column-values)
+13. [Create a Board](#13-create-a-board)
+14. [Create a Column](#14-create-a-column)
+15. [Create a Group](#15-create-a-group)
+16. [Create a Subitem](#16-create-a-subitem)
+17. [Create a Subitem (Using Variables)](#17-create-a-subitem-using-variables)
+18. [Create a Workspace](#18-create-a-workspace)
+19. [Check a Checkbox](#19-check-a-checkbox)
+20. [Uncheck a Checkbox](#20-uncheck-a-checkbox)
+21. [Change a Connect Boards Column](#21-change-a-connect-boards-column)
+22. [Change a Country Column](#22-change-a-country-column)
+23. [Change a Date Column](#23-change-a-date-column)
+24. [Change a Dropdown Column](#24-change-a-dropdown-column)
+25. [Change an Email Column](#25-change-an-email-column)
+26. [Change an Hour Column](#26-change-an-hour-column)
+27. [Change an Item's Name](#27-change-an-items-name)
+28. [Change a Link Column](#28-change-a-link-column)
+29. [Change a Location Column](#29-change-a-location-column)
+30. [Change a Long Text Column](#30-change-a-long-text-column)
+31. [Change a Numbers Column](#31-change-a-numbers-column)
+32. [Change a People Column](#32-change-a-people-column)
+33. [Change a Phone Column](#33-change-a-phone-column)
+34. [Change a Rating Column](#34-change-a-rating-column)
+35. [Change a Status Column](#35-change-a-status-column)
+36. [Change a Tags Column](#36-change-a-tags-column)
+37. [Change a Text Column](#37-change-a-text-column)
+38. [Change a Timeline Column](#38-change-a-timeline-column)
+39. [Change a Week Column](#39-change-a-week-column)
+40. [Change a World Clock Column](#40-change-a-world-clock-column)
+41. [Clear a Text Column](#41-clear-a-text-column)
+42. [Clear a Numbers Column](#42-clear-a-numbers-column)
+43. [Clear a Files Column](#43-clear-a-files-column)
+44. [Clear a Connect Boards Column](#44-clear-a-connect-boards-column)
+45. [Clear a Dependency Column](#45-clear-a-dependency-column)
+46. [Clear a Status Column](#46-clear-a-status-column)
+47. [Clear a People Column](#47-clear-a-people-column)
+48. [Get Specific Values in Column Values for a Location Column](#48-get-specific-values-in-column-values-for-a-location-column)
+49. [Get Specific Values in Column Values for a Status Column](#49-get-specific-values-in-column-values-for-a-status-column)
+50. [Get Specific Values in Column Values for a Checkbox Column](#50-get-specific-values-in-column-values-for-a-checkbox-column)
+51. [Get Specific Values in Column Values for a Connect Boards Column](#51-get-specific-values-in-column-values-for-a-connect-boards-column)
+52. [Get Specific Values in Column Values for a Country Column](#52-get-specific-values-in-column-values-for-a-country-column)
+53. [Get Specific Values in Column Values for a Date Column](#53-get-specific-values-in-column-values-for-a-date-column)
+54. [Get Specific Values in Column Values for a Dependency Column](#54-get-specific-values-in-column-values-for-a-dependency-column)
+55. [Get Specific Values in Column Values for a Dropdown Column](#55-get-specific-values-in-column-values-for-a-dropdown-column)
+56. [Get Specific Values in Column Values for an Email Column](#56-get-specific-values-in-column-values-for-an-email-column)
+57. [Get Specific Values in Column Values for an Hour Column](#57-get-specific-values-in-column-values-for-an-hour-column)
+58. [Get Specific Values in Column Values for a Link Column](#58-get-specific-values-in-column-values-for-a-link-column)
+59. [Get Specific Values in Column Values for a Long Text Column](#59-get-specific-values-in-column-values-for-a-long-text-column)
+60. [Get Specific Values in Column Values for a Monday Doc Column](#60-get-specific-values-in-column-values-for-a-monday-doc-column)
+61. [Get Specific Values in Column Values for a Numbers Column](#61-get-specific-values-in-column-values-for-a-numbers-column)
+62. [Get Specific Values in Column Values for a People Column](#62-get-specific-values-in-column-values-for-a-people-column)
+63. [Get Specific Values in Column Values for a Phone Column](#63-get-specific-values-in-column-values-for-a-phone-column)
+64. [Get Specific Values in Column Values for a Status Column](#64-get-specific-values-in-column-values-for-a-status-column)
+65. [Using `items_page` with Query Parameters](#65-using-items_page-with-query-parameters)
+66. [Using `next_items_page`](#66-using-next_items_page)
+67. [Using `items_page`](#67-using-items_page)
+68. [Using `items_page_by_column_values`](#68-using-items_page_by_column_values)
+69. [Move an Item to a Different Board](#69-move-an-item-to-a-different-board)
+70. [Get Items Linked to a Specific Item](#70-get-items-linked-to-a-specific-item)
+71. [Clear Column Values](#71-clear-column-values)
+72. [Get Specific Values in Column Values for a Rating Column](#72-get-specific-values-in-column-values-for-a-rating-column)
+73. [Get Specific Values in Column Values for a Tags Column](#73-get-specific-values-in-column-values-for-a-tags-column)
+74. [Get Specific Values in Column Values for a Text Column](#74-get-specific-values-in-column-values-for-a-text-column)
+75. [Get Specific Values in Column Values for a Timeline Column](#75-get-specific-values-in-column-values-for-a-timeline-column)
+76. [Get Specific Values in Column Values for a Week Column](#76-get-specific-values-in-column-values-for-a-week-column)
+77. [Create a Tag](#77-create-a-tag)
+78. [Create an Update](#78-create-an-update)
+79. [Create a Webhook](#79-create-a-webhook)
 
-This query checks the complexity points of your API requests, helping you monitor rate limits.
+---
 
-#### Query
+## Important Updates (October 2023)
+
+**Breaking Changes:**
+
+1. **Removed Deprecated `items` Field on Boards Queries:**
+   - The `items` field on boards queries has been removed.
+   - Use `items_page` instead.
+
+2. **New Column Values Fields and Typed Column Values:**
+   - Column values now have specific types.
+   - Use the appropriate typed column values in queries.
+
+3. **Removed Deprecated `items_by_column_values` and `items_by_multiple_column_values`:**
+   - Use `items_page_by_column_values` instead.
+
+4. **`column_type` Field on `create_column` Mutation is Now Required:**
+   - You must specify `column_type` when creating a column.
+
+5. **Empty Parentheses No Longer Supported:**
+   - Avoid using empty parentheses `()` in queries.
+
+6. **Quotation Marks for Strings are Now Required:**
+   - All string values must be enclosed in quotation marks.
+
+7. **Removed Deprecated `pos` Fields on Boards and Columns Queries:**
+   - The `pos` field is no longer available.
+
+8. **`type` Field on Columns Queries Changed from `String!` to `ColumnType!`:**
+   - Adjust your queries accordingly.
+
+9. **Deprecated `newest_first` Argument on Boards Queries:**
+   - This argument is no longer supported.
+
+10. **ID Arguments and Fields Changed from `Int` to `ID`:**
+    - Update your variable types if necessary.
+
+11. **`text` Field Returns Empty Results for Mirror, Dependency, and Connect Boards Columns:**
+    - Use the appropriate fields for these column types.
+
+**Non-Breaking Changes:**
+
+1. **New `move_item_to_board` Mutation:**
+   - Allows moving items between boards.
+
+2. **New `linked_items` Field on Items Queries:**
+   - Retrieve items linked through connect boards columns.
+
+3. **New `edit_update` and `delete_update` Webhooks:**
+   - Monitor when updates are edited or deleted.
+
+4. **`value` Argument in `change_simple_column_value` Mutation is Now Nullable:**
+   - You can set `value` to `null` to clear column values.
+
+5. **Increased Complexity of `text` Field for Mirror, Link, and Dependency Columns:**
+   - Be mindful of complexity limits when querying these fields.
+
+---
+
+
+## 1. Check Complexity Points Usage
+
+**Description:** Monitor your API rate limits by checking the complexity points of your requests.
+
+### **Query Template**
+
 ```graphql
 query {
   complexity {
@@ -56,292 +161,406 @@ query {
     after
     reset_in_x_seconds
   }
-  boards(ids: 1614669298) {
+  boards(ids: {{ board_id }}) {
     id
     name
   }
 }
 ```
 
-#### Response Template
+**Instructions:**
+
+- **`{{ board_id }}`**: Replace with the ID of the board you want to query.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "complexity": {
-      "before": 4999805,
-      "query": 12,
-      "after": 4999793,
-      "reset_in_x_seconds": 23
+      "before": {{ before_points }},
+      "query": {{ query_points }},
+      "after": {{ after_points }},
+      "reset_in_x_seconds": {{ reset_time }}
     },
     "boards": [
       {
-        "id": "1614669298",
-        "name": "Sample project"
+        "id": "{{ board_id }}",
+        "name": "{{ board_name }}"
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
 
 ---
 
-### 2. **Update Simple Column Value**
+## 2. Update Simple Column Value
 
-This mutation updates a simple text-based column value for a specific item on a board.
+**Description:** Update a text-based column value for a specific item on a board.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_simple_column_value(
-    item_id: 1655422739,
-    board_id: 1614669298,
-    column_id: "text__1",
-    value: "Some text"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_id: "{{ column_id }}",
+    value: "{{ new_value }}"
   ) {
     id
   }
 }
 ```
 
-#### Response Template
+**Instructions:**
+
+- **`{{ item_id }}`**: Replace with the ID of the item you want to update.
+- **`{{ board_id }}`**: Replace with the ID of the board containing the item.
+- **`{{ column_id }}`**: Replace with the ID of the column you want to update.
+- **`{{ new_value }}`**: Replace with the new text value for the column.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_simple_column_value": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
 
 ---
 
-### 3. **Update Complex Column Value**
+## 3. Update Complex Column Value
 
-This mutation changes the value of a more complex column, such as an email, which requires a structured JSON input.
+**Description:** Update a complex column (e.g., email) that requires a JSON-formatted value.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_column_value(
-    item_id: 1655422739,
-    board_id: 1614669298,
-    column_id: "email",
-    value: "{\"text\":\"test@gmail.com\",\"email\":\"test@gmail.com\"}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_id: "{{ column_id }}",
+    value: "{{ json_value }}"
   ) {
     id
   }
 }
 ```
 
-#### Response Template
+**Instructions:**
+
+- **`{{ item_id }}`**: Replace with the ID of the item you want to update.
+- **`{{ board_id }}`**: Replace with the ID of the board containing the item.
+- **`{{ column_id }}`**: Replace with the ID of the complex column.
+- **`{{ json_value }}`**: Replace with the JSON string representing the new value.
+
+**Example JSON Value for Email Column:**
+
+```json
+"{\"text\":\"{{ email_text }}\",\"email\":\"{{ email_address }}\"}"
+```
+
+- **`{{ email_text }}`**: Display name or label for the email.
+- **`{{ email_address }}`**: Actual email address.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_column_value": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
 
-### 4. **Upload a File to a Files Column**
+---
 
-This mutation uploads a file to a specific files column within an item.
+## 4. Upload a File to a Files Column
 
-#### Mutation
+**Description:** Upload a file to a specific files column within an item.
+
+### **Mutation Template**
+
 ```graphql
 mutation add_file($file: File!) {
-  add_file_to_column(item_id: 1234567890, column_id: "files", file: $file) {
+  add_file_to_column(
+    item_id: {{ item_id }},
+    column_id: "{{ column_id }}",
+    file: $file
+  ) {
     id
   }
 }
 ```
 
-#### Form Data (for file upload)
-| Key  | Value                           |
-|------|---------------------------------|
-| map  | {"image": "variables.file"}     |
-| image| [Upload your file here]         |
+**Instructions:**
 
----
+- **`{{ item_id }}`**: Replace with the ID of the item.
+- **`{{ column_id }}`**: Replace with the ID of the files column.
+- **`$file`**: Represents the file to be uploaded; it should be included in the form data.
 
-#### Response Template
+### **Form Data for File Upload**
+
+| Key         | Value                                     |
+|-------------|-------------------------------------------|
+| **query**       | The mutation query above.                 |
+| **variables**   | `{"file": null}`                          |
+| **map**         | `{"file": ["variables.file"]}`            |
+| **file**        | [Attach your file here in the form data] |
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "add_file_to_column": {
-      "id": "1234567890"
+      "id": "{{ item_id }}"
     }
   }
 }
 ```
 
+---
 
-### 5. **Upload a File to an Update**
+## 5. Upload a File to an Update
 
-This mutation uploads a file to a specific update, which can be used for attachments in communication threads.
+**Description:** Upload a file to a specific update, useful for attachments in communication threads.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation ($file: File!) {
-  add_file_to_update(file: $file, update_id: 1234567890) {
+  add_file_to_update(
+    file: $file,
+    update_id: {{ update_id }}
+  ) {
     id
   }
 }
 ```
 
-#### Form Data (for file upload)
-| Key  | Value                           |
-|------|---------------------------------|
-| map  | {"image": "variables.file"}     |
-| image| [Upload your file here]         |
+**Instructions:**
 
----
+- **`{{ update_id }}`**: Replace with the ID of the update.
+- **`$file`**: Represents the file to be uploaded; it should be included in the form data.
 
-#### Response Template
+### **Form Data for File Upload**
+
+| Key         | Value                                     |
+|-------------|-------------------------------------------|
+| **query**       | The mutation query above.                 |
+| **variables**   | `{"file": null}`                          |
+| **map**         | `{"file": ["variables.file"]}`            |
+| **file**        | [Attach your file here in the form data] |
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "add_file_to_update": {
-      "id": "1234567890"
+      "id": "{{ update_id }}"
     }
   }
 }
-
 ```
-### 6. **Create a Notification**
 
-This mutation creates a notification targeted to a specific user or board/project.
+---
 
-#### Mutation
+## 6. Create a Notification
+
+**Description:** Create a notification targeted to a specific user or project.
+
+### **Mutation Template**
+
 ```graphql
 mutation {
   create_notification(
-    user_id: 65548265,
-    target_id: 1655422739,
-    text: "This is a notification",
-    target_type: Project
+    user_id: {{ user_id }},
+    target_id: {{ target_id }},
+    text: "{{ notification_text }}",
+    target_type: {{ target_type }}
   ) {
     text
   }
 }
 ```
 
-#### Response Template
+**Instructions:**
+
+- **`{{ user_id }}`**: Replace with the ID of the user who will receive the notification.
+- **`{{ target_id }}`**: Replace with the ID of the target (e.g., item, project).
+- **`{{ notification_text }}`**: Replace with the content of the notification.
+- **`{{ target_type }}`**: Replace with the target type (e.g., `Project`, `Post`, `Update`).
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_notification": {
-      "text": "This is a notification"
+      "text": "{{ notification_text }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
 
 ---
 
-### 7. **Create an Item**
+## 7. Create an Item
 
-This mutation creates a new item on a board within a specified group.
+**Description:** Create a new item on a board within a specified group.
 
-#### Mutation
-```graphql
-mutation {
-  create_item(board_id: 1614669298, group_id: "topics", item_name: "new item") {
-    id
-  }
-}
-```
+### **Mutation Template**
 
-#### Response Template
-```json
-{
-  "data": {
-    "create_item": {
-      "id": "1710752117"
-    }
-  },
-  "account_id": 25228442
-}
-```
----
-
-### 8. **Create an Item (Using Variables)**
-
-This example shows how to use variables to create an item, which is especially useful in dynamic requests.
-
-#### Mutation
-```graphql
-mutation createItem($boardId: Int!, $groupId: String!, $itemName: String!) {
-  create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName) {
-    id
-  }
-}
-```
-
-#### Variables
-```json
-{
-  "boardId": "1937184631",
-  "groupId": "mvp_release__1",
-  "itemName": "Code Review"
-}
-
-```
-#### Response Template
-```json
-{
-  "data": {
-    "create_item": {
-      "id": "1939643213"
-    }
-  },
-  "account_id": 26381028
-}
-```
----
-
-### 9. **Create an Item with Column Values**
-
-This mutation creates an item and sets column values such as status or text at creation.
-
-#### Mutation
 ```graphql
 mutation {
   create_item(
-    board_id: 1614669298,
-    group_id: "topics",
-    item_name: "new item",
-    column_values: "{\"status\":\"Done\", \"text\":\"My Text\"}"
+    board_id: {{ board_id }},
+    group_id: "{{ group_id }}",
+    item_name: "{{ item_name }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ board_id }}`**: Replace with the ID of the board.
+- **`{{ group_id }}`**: Replace with the ID of the group.
+- **`{{ item_name }}`**: Replace with the name of the new item.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_item": {
-      "id": "1710782705"
+      "id": "{{ new_item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 8. Create an Item (Using Variables)
 
-### 10. **Retrieve Account Details**
+**Description:** Use variables to create an item, helpful for dynamic requests.
 
-This query retrieves information about the Monday.com account, such as active members, country, and account name.
+### **Mutation Template**
 
-#### Query
+```graphql
+mutation createItem($boardId: Int!, $groupId: String!, $itemName: String!) {
+  create_item(
+    board_id: $boardId,
+    group_id: $groupId,
+    item_name: $itemName
+  ) {
+    id
+  }
+}
+```
+
+**Variables Template**
+
+```json
+{
+  "boardId": {{ board_id }},
+  "groupId": "{{ group_id }}",
+  "itemName": "{{ item_name }}"
+}
+```
+
+**Instructions:**
+
+- **`$boardId`**: Set to the board ID.
+- **`$groupId`**: Set to the group ID.
+- **`$itemName`**: Set to the item name.
+
+### **Expected Response Structure**
+
+```json
+{
+  "data": {
+    "create_item": {
+      "id": "{{ new_item_id }}"
+    }
+  },
+  "account_id": {{ account_id }}
+}
+```
+
+---
+
+## 9. Create an Item with Column Values
+
+**Description:** Create an item and set column values such as status or text at creation.
+
+### **Mutation Template**
+
+```graphql
+mutation {
+  create_item(
+    board_id: {{ board_id }},
+    group_id: "{{ group_id }}",
+    item_name: "{{ item_name }}",
+    column_values: "{{ column_values_json }}"
+  ) {
+    id
+  }
+}
+```
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Replace with a JSON string of column values.
+
+**Example Column Values JSON:**
+
+```json
+"{\"status\":\"Done\", \"text\":\"My Text\"}"
+```
+
+- **`"status"`**: Column ID for the status column.
+- **`"text"`**: Column ID for the text column.
+
+### **Expected Response Structure**
+
+```json
+{
+  "data": {
+    "create_item": {
+      "id": "{{ new_item_id }}"
+    }
+  },
+  "account_id": {{ account_id }}
+}
+```
+
+---
+
+## 10. Retrieve Account Details
+
+**Description:** Retrieve information about the account, such as active members and plan details.
+
+### **Query Template**
+
 ```graphql
 query {
   account {
@@ -355,33 +574,40 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- No variables need to be replaced.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "account": {
-      "id": "25228442",
-      "name": "Example Company",
-      "country_code": "US",
-      "active_members_count": 25,
+      "id": "{{ account_id }}",
+      "name": "{{ account_name }}",
+      "country_code": "{{ country_code }}",
+      "active_members_count": {{ active_members_count }},
       "plan": {
-        "name": "Pro"
+        "name": "{{ plan_name }}"
       }
     }
   }
 }
-
 ```
+
 ---
 
-### 11. **List Board Details**
+## 11. List Board Details
 
-Using the `Board` schema, this query fetches board information, including the name, description, columns, and item count.
+**Description:** Fetch board information, including name, description, columns, and item count.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  boards(ids: [1234567890]) {
+  boards(ids: [{{ board_id }}]) {
     id
     name
     description
@@ -394,130 +620,135 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ board_id }}`**: Replace with the board ID.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "boards": [
       {
-        "id": "1614669298",
-        "name": "Sample project",
-        "description": "Add your board's description here",
-        "items_count": 5,
+        "id": "{{ board_id }}",
+        "name": "{{ board_name }}",
+        "description": "{{ board_description }}",
+        "items_count": {{ items_count }},
         "columns": [
           {
-            "id": "name",
-            "title": "Name",
-            "type": "name"
-          },
-          {
-            "id": "subitems",
-            "title": "Subitems",
-            "type": "subtasks"
-          },
-          {
-            "id": "person",
-            "title": "assignee",
-            "type": "people"
-          },
-          {
-            "id": "status__1",
-            "title": "Status",
-            "type": "status"
-          },
-          {
-            "id": "text__1",
-            "title": "client_name",
-            "type": "text"
-          },
-          {
-            "id": "text_1__1",
-            "title": "Text 1",
-            "type": "text"
-          },
-          {
-            "id": "item_id__1",
-            "title": "Item ID",
-            "type": "item_id"
+            "id": "{{ column_id }}",
+            "title": "{{ column_title }}",
+            "type": "{{ column_type }}"
           }
+          // Additional columns...
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 12. **Create an Item with Detailed Column Values**
+## 12. Create an Item with Detailed Column Values
 
-To create an item with column values, we can add multiple column types by referencing `ColumnType` in the schema. Here’s an example with a few specific column types.
+**Description:** Create an item with multiple column types by specifying detailed column values.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   create_item(
-    board_id: 1614669298,
-    group_id: "topics",
-    item_name: "Task for Project",
-    column_values: "{\"status\":\"Working on it\", \"priority\":\"High\", \"date\":\"2023-10-01\"}"
+    board_id: {{ board_id }},
+    group_id: "{{ group_id }}",
+    item_name: "{{ item_name }}",
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Replace with a JSON string containing the desired column values.
+
+**Example Column Values JSON:**
+
+```json
+"{\"status\":\"Working on it\", \"priority\":\"High\", \"date\":\"{{ date_value }}\"}"
+```
+
+- **`{{ date_value }}`**: Replace with a date in `YYYY-MM-DD` format.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_item": {
-      "id": "1710794933"
+      "id": "{{ new_item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-Let me know if you'd like to expand on specific fields or entities, and I can customize further based on the schema.
+## 13. Create a Board
 
-### 13. **Create a Board**
+**Description:** Create a new board with a specified name and visibility.
 
-This mutation creates a new board with a specified name and visibility kind (`public`, `private`, or `share`). The `BoardKind` enum in the schema allows for these options.
+### **Mutation Template**
 
-#### Mutation
 ```graphql
 mutation {
-  create_board(board_name: "my board", board_kind: public) {
+  create_board(
+    board_name: "{{ board_name }}",
+    board_kind: {{ board_kind }}
+  ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ board_name }}`**: Replace with the new board's name.
+- **`{{ board_kind }}`**: Replace with `public`, `private`, or `share`.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_board": {
-      "id": "1710799453"
+      "id": "{{ new_board_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 14. **Create a Column**
+## 14. Create a Column
 
-This mutation creates a new column on an existing board, with options for specifying the column title, description, and type. Referencing the `ColumnType` enum allows types such as `status`, `text`, `number`, etc.
+**Description:** Create a new column on an existing board.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   create_column(
-    board_id: 1614669298,
-    title: "Work Status",
-    description: "This is my work status column",
-    column_type: status
+    board_id: {{ board_id }},
+    title: "{{ column_title }}",
+    description: "{{ column_description }}",
+    column_type: {{ column_type }}
   ) {
     id
     title
@@ -525,54 +756,78 @@ mutation {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_title }}`**: Replace with the column's title.
+- **`{{ column_description }}`**: Replace with a description.
+- **`{{ column_type }}`**: Replace with the column type (e.g., `status`, `text`, `number`).
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_column": {
-      "id": "work_status__1",
-      "title": "Work Status",
-      "description": "This is my work status column"
+      "id": "{{ new_column_id }}",
+      "title": "{{ column_title }}",
+      "description": "{{ column_description }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 15. **Create a Group**
+## 15. Create a Group
 
-This mutation adds a new group to a specific board. A group in Monday.com can help organize items, allowing multiple categories or phases within a board.
+**Description:** Add a new group to a specific board.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
-  create_group(board_id: 1614669298, group_name: "new group") {
+  create_group(
+    board_id: {{ board_id }},
+    group_name: "{{ group_name }}"
+  ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ group_name }}`**: Replace with the new group's name.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_group": {
-      "id": "new_group__1"
+      "id": "{{ new_group_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 16. **Create a Subitem**
+## 16. Create a Subitem
 
-This mutation creates a subitem under a specified parent item. Subitems allow for more granular task organization within a primary item on a board.
+**Description:** Create a subitem under a specified parent item.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
-  create_subitem(parent_item_id: 1655422739, item_name: "new subitem") {
+  create_subitem(
+    parent_item_id: {{ parent_item_id }},
+    item_name: "{{ subitem_name }}"
+  ) {
     id
     board {
       id
@@ -580,31 +835,41 @@ mutation {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ parent_item_id }}`**: Replace with the parent item ID.
+- **`{{ subitem_name }}`**: Replace with the subitem's name.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_subitem": {
-      "id": "1710911835",
+      "id": "{{ subitem_id }}",
       "board": {
-        "id": "1614669310"
+        "id": "{{ subitem_board_id }}"
       }
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
+## 17. Create a Subitem (Using Variables)
 
-### 17. **Create a Subitem (Using Variables)**
+**Description:** Create a subitem using variables for dynamic requests.
 
-This mutation achieves the same functionality as above, but it uses variables to enhance flexibility in dynamic requests.
+### **Mutation Template**
 
-#### Mutation
 ```graphql
 mutation createSubitem($parentId: Int!, $name: String!) {
-  create_subitem(parent_item_id: $parentId, item_name: $name) {
+  create_subitem(
+    parent_item_id: $parentId,
+    item_name: $name
+  ) {
     id
     board {
       id
@@ -613,930 +878,1310 @@ mutation createSubitem($parentId: Int!, $name: String!) {
 }
 ```
 
-#### Variables
+**Variables Template**
+
 ```json
 {
-  "parentId": 1234567,
-  "name": "new subitem"
+  "parentId": {{ parent_item_id }},
+  "name": "{{ subitem_name }}"
 }
 ```
 
+**Instructions:**
 
-⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
-#### Response Template
+- **`$parentId`**: Set to the parent item ID.
+- **`$name`**: Set to the subitem name.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_subitem": {
-      "id": "9876543",
+      "id": "{{ subitem_id }}",
       "board": {
-        "id": "1234567890"
+        "id": "{{ subitem_board_id }}"
       }
     }
   }
 }
-
 ```
 
+---
 
+## 18. Create a Workspace
 
+**Description:** Create a workspace with a specific name, kind, and description.
 
-### 18. **Create a Workspace**
+### **Mutation Template**
 
-This mutation creates a workspace with a specific name, kind (`open` or `closed`), and description. Workspaces help organize boards and streamline collaboration.
-
-#### Mutation
 ```graphql
 mutation {
   create_workspace(
-    name: "New Cool Workspace",
-    kind: open,
-    description: "This is a cool description"
+    name: "{{ workspace_name }}",
+    kind: {{ workspace_kind }},
+    description: "{{ workspace_description }}"
   ) {
     id
     description
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ workspace_name }}`**: Replace with the workspace's name.
+- **`{{ workspace_kind }}`**: Replace with `open` or `closed`.
+- **`{{ workspace_description }}`**: Replace with a description.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_workspace": {
-      "id": "3107802",
-      "description": "This is a cool description"
+      "id": "{{ workspace_id }}",
+      "description": "{{ workspace_description }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 19. **Check a Checkbox**
+## 19. Check a Checkbox
 
-This mutation sets a checkbox column value to checked (`true`). Using `change_multiple_column_values` allows modifying multiple columns simultaneously.
+**Description:** Set a checkbox column value to checked (`true`).
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1655422739,
-    board_id: 1614669298,
-    column_values: "{\"checkbox\": {\"checked\": \"true\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string to check the checkbox.
+
+**Example Column Values JSON:**
+
+```json
+"{\"{{ checkbox_column_id }}\": {\"checked\": \"true\"}}"
+```
+
+- **`{{ checkbox_column_id }}`**: Replace with the ID of the checkbox column.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 20. **Uncheck a Checkbox**
+## 20. Uncheck a Checkbox
 
-This mutation unchecks a checkbox by setting its value to `null`, effectively removing the checkmark.
+**Description:** Uncheck a checkbox by setting its value to `null`.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1655422739,
-    board_id: 1614669298,
-    column_values: "{\"checkbox\": null}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string to uncheck the checkbox.
+
+**Example Column Values JSON:**
+
+```json
+"{\"{{ checkbox_column_id }}\": null}"
+```
+
+- **`{{ checkbox_column_id }}`**: Replace with the ID of the checkbox column.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
+
 ---
 
+## 21. Change a Connect Boards Column
 
-### 21. **Change a Connect Boards Column**
+**Description:** Update a "Connect Boards" column by linking items from other boards, useful for creating cross-board relationships.
 
-This mutation updates a "Connect Boards" column by linking items from other boards. This is useful for creating cross-board relationships.
+### **Mutation Template**
 
-#### Mutation
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1234567890,
-    board_id: 1122334455,
-    column_values: "{\"connect_boards\": {\"item_ids\": [123123123, 456456456]}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id }}`**: Replace with the ID of the item to update.
+- **`{{ board_id }}`**: Replace with the ID of the board containing the item.
+- **`{{ column_values_json }}`**: Replace with a JSON string representing the column values.
+
+**Example Column Values JSON:**
+
+```json
+"{\"{{ connect_boards_column_id }}\": {\"item_ids\": [{{ linked_item_id1 }}, {{ linked_item_id2 }}]}}"
+```
+
+- **`{{ connect_boards_column_id }}`**: Replace with the ID of the "Connect Boards" column.
+- **`{{ linked_item_id1 }}`, `{{ linked_item_id2 }}`**: Replace with the IDs of the items you want to link.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1234567890"
+      "id": "{{ item_id }}"
     }
   }
 }
-
 ```
+
 ---
 
-### 22. **Change a Country Column**
+## 22. Change a Country Column
 
-This mutation updates a country column with a specific country code and name, following the `CountryColumn` schema.
+**Description:** Update a country column with a specific country code and name.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 11111,
-    board_id: 22222,
-    column_values: "{\"country__1\": {\"countryCode\": \"US\", \"countryName\": \"United States\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ country_column_id }}\": {\"countryCode\": \"{{ country_code }}\", \"countryName\": \"{{ country_name }}\"}}"
+```
+
+- **`{{ country_column_id }}`**: Replace with the ID of the country column.
+- **`{{ country_code }}`**: Replace with the country's ISO code (e.g., "US").
+- **`{{ country_name }}`**: Replace with the country's full name (e.g., "United States").
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 23. **Change a Date Column**
+## 23. Change a Date Column
 
-This mutation updates a date column with a specified date and optional time value.
+**Description:** Update a date column with a specified date and optional time value.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1655422739,
-    board_id: 1614669298,
-    column_values: "{\"date__1\": {\"date\": \"1993-08-27\", \"time\": \"18:00:00\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ date_column_id }}\": {\"date\": \"{{ date_value }}\", \"time\": \"{{ time_value }}\"}}"
+```
+
+- **`{{ date_column_id }}`**: Replace with the ID of the date column.
+- **`{{ date_value }}`**: Replace with the date in `YYYY-MM-DD` format.
+- **`{{ time_value }}`**: (Optional) Replace with the time in `HH:MM:SS` format.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
+## 24. Change a Dropdown Column
 
-### 24. **Change a Dropdown Column**
+**Description:** Update a dropdown column by selecting specific options, with an option to create new labels if they don’t already exist.
 
-This mutation updates a dropdown column by selecting specific options, with an option to create new labels if they don’t already exist in the dropdown menu.
+### **Mutation Template**
 
-#### Mutation
 ```graphql
 mutation {
   change_simple_column_value(
-    item_id: 1234567890,
-    board_id: 1122334455,
-    column_id: "dropdown",
-    value: "Cookie, Cupcake",
-    create_labels_if_missing: true
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_id: "{{ dropdown_column_id }}",
+    value: "{{ options }}",
+    create_labels_if_missing: {{ create_labels_if_missing }}
   ) {
     id
   }
 }
 ```
 
+**Instructions:**
 
-#### Response Template
+- **`{{ dropdown_column_id }}`**: Replace with the ID of the dropdown column.
+- **`{{ options }}`**: Replace with a comma-separated list of options (e.g., "Option1, Option2").
+- **`{{ create_labels_if_missing }}`**: Replace with `true` or `false`.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_simple_column_value": {
-      "id": "1234567890"
+      "id": "{{ item_id }}"
     }
   }
 }
-
-
 ```
 
-⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+---
 
+## 25. Change an Email Column
 
-### 25. **Change an Email Column**
+**Description:** Update an email column with a new email address and optional label text.
 
-This mutation updates an email column with a new email address and optional label text.
+### **Mutation Template**
 
-#### Mutation
 ```graphql
 mutation {
   change_simple_column_value(
-    item_id: 1655422739,
-    board_id: 1614669298,
-    column_id: "email__1",
-    value: "example@example.com This is an example email"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_id: "{{ email_column_id }}",
+    value: "{{ email_value }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ email_column_id }}`**: Replace with the ID of the email column.
+- **`{{ email_value }}`**: Replace with the email address and optional text, separated by a space.
+
+**Example Email Value:**
+
+```
+"example@example.com Optional Label"
+```
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_simple_column_value": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 26. **Change an Hour Column**
+## 26. Change an Hour Column
 
-This mutation sets the hour and minute values for an hour-type column.
+**Description:** Set the hour and minute values for an hour-type column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"hour__1\": {\"hour\": 16, \"minute\": 42}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ hour_column_id }}\": {\"hour\": {{ hour }}, \"minute\": {{ minute }}}}"
+```
+
+- **`{{ hour_column_id }}`**: Replace with the ID of the hour column.
+- **`{{ hour }}`**: Replace with the hour value (0-23).
+- **`{{ minute }}`**: Replace with the minute value (0-59).
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 27. **Change an Item's Name**
+## 27. Change an Item's Name
 
-This mutation changes the name of a specific item.
+**Description:** Change the name of a specific item.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"text8__1\": \"My Item\"}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"name\": \"{{ new_item_name }}\"}"
+```
+
+- **`{{ new_item_name }}`**: Replace with the new name for the item.
+
+**Note:** Alternatively, you can use the specific column ID if "name" does not work.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 28. **Change a Link Column**
+## 28. Change a Link Column
 
-This mutation updates a link column with a URL and display text.
+**Description:** Update a link column with a URL and display text.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"link__1\": {\"url\": \"http://monday.com\", \"text\": \"go to monday!\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ link_column_id }}\": {\"url\": \"{{ url }}\", \"text\": \"{{ link_text }}\"}}"
+```
+
+- **`{{ link_column_id }}`**: Replace with the ID of the link column.
+- **`{{ url }}`**: Replace with the URL.
+- **`{{ link_text }}`**: Replace with the display text.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 29. **Change a Location Column**
+## 29. Change a Location Column
 
-This mutation updates a location column with latitude, longitude, and address details.
+**Description:** Update a location column with latitude, longitude, and address details.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"location__1\": {\"lat\": \"29.9772962\", \"lng\": \"31.1324955\", \"address\": \"Giza Pyramid Complex\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ location_column_id }}\": {\"lat\": \"{{ latitude }}\", \"lng\": \"{{ longitude }}\", \"address\": \"{{ address }}\"}}"
+```
+
+- **`{{ location_column_id }}`**: Replace with the ID of the location column.
+- **`{{ latitude }}`**: Replace with the latitude coordinate.
+- **`{{ longitude }}`**: Replace with the longitude coordinate.
+- **`{{ address }}`**: Replace with the address.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 30. **Change a Long Text Column**
+## 30. Change a Long Text Column
 
-This mutation updates a long text column with new content.
+**Description:** Update a long text column with new content.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"long_text__1\": {\"text\": \"Sample text\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ long_text_column_id }}\": {\"text\": \"{{ text_content }}\"}}"
+```
+
+- **`{{ long_text_column_id }}`**: Replace with the ID of the long text column.
+- **`{{ text_content }}`**: Replace with the new text content.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 31. **Change a Numbers Column**
+## 31. Change a Numbers Column
 
-This mutation updates a numbers column with a new numeric value.
+**Description:** Update a numbers column with a new numeric value.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"numbers__1\": \"3\"}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ numbers_column_id }}\": \"{{ number_value }}\"}"
+```
+
+- **`{{ numbers_column_id }}`**: Replace with the ID of the numbers column.
+- **`{{ number_value }}`**: Replace with the numeric value.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
-##error
 
-### 32. **Change a People Column**
+## 32. Change a People Column
 
-This mutation assigns people or teams to a people column.
+**Description:** Assign people or teams to a people column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 11111,
-    board_id: 22222,
-    column_values: "{\"people_2\": {\"personsAndTeams\": [{\"id\": 4616627, \"kind\": \"person\"}, {\"id\": 4616666, \"kind\": \"person\"}, {\"id\": 51166, \"kind\": \"team\"}]}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ people_column_id }}\": {\"personsAndTeams\": [{\"id\": {{ person_id1 }}, \"kind\": \"person\"}, {\"id\": {{ person_id2 }}, \"kind\": \"person\"}, {\"id\": {{ team_id }}, \"kind\": \"team\"}]}}"
+```
+
+- **`{{ people_column_id }}`**: Replace with the ID of the people column.
+- **`{{ person_id1 }}`, `{{ person_id2 }}`**: Replace with the IDs of the people.
+- **`{{ team_id }}`**: Replace with the ID of the team.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "11111"
+      "id": "{{ item_id }}"
     }
   }
 }
-
 ```
+
 ---
 
-### 33. **Change a Phone Column**
+## 33. Change a Phone Column
 
-This mutation updates a phone column with a new phone number and country code.
+**Description:** Update a phone column with a new phone number and country code.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"phone__1\": {\"phone\": \"11231234567\", \"countryShortName\": \"US\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ phone_column_id }}\": {\"phone\": \"{{ phone_number }}\", \"countryShortName\": \"{{ country_code }}\"}}"
+```
+
+- **`{{ phone_column_id }}`**: Replace with the ID of the phone column.
+- **`{{ phone_number }}`**: Replace with the phone number.
+- **`{{ country_code }}`**: Replace with the country code (e.g., "US").
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 34. **Change a Rating Column**
+## 34. Change a Rating Column
 
-This mutation updates a rating column with a new rating value.
+**Description:** Update a rating column with a new rating value.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"rating__1\": {\"rating\": 5}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ rating_column_id }}\": {\"rating\": {{ rating_value }}}}"
+```
+
+- **`{{ rating_column_id }}`**: Replace with the ID of the rating column.
+- **`{{ rating_value }}`**: Replace with the rating value (e.g., 1 to 5).
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 35. **Change a Status Column**
+## 35. Change a Status Column
 
-This mutation sets a new label for a status column.
+**Description:** Set a new label for a status column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"status_1__1\": {\"label\": \"Done\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}",
+    create_labels_if_missing: {{ create_labels_if_missing }}
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ status_column_id }}\": {\"label\": \"{{ status_label }}\"}}"
+```
+
+- **`{{ status_column_id }}`**: Replace with the ID of the status column.
+- **`{{ status_label }}`**: Replace with the status label.
+- **`{{ create_labels_if_missing }}`**: Replace with `true` or `false`.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 36. **Change a Tags Column**
+## 36. Change a Tags Column
 
-This mutation updates a tags column with specified tag IDs.
+**Description:** Update a tags column with specified tag IDs.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"tags__1\": {\"tag_ids\": [295026, 295064]}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}",
+    create_labels_if_missing: {{ create_labels_if_missing }}
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ tags_column_id }}\": {\"tag_ids\": [{{ tag_id1 }}, {{ tag_id2 }}]}}"
+```
+
+- **`{{ tags_column_id }}`**: Replace with the ID of the tags column.
+- **`{{ tag_id1 }}`, `{{ tag_id2 }}`**: Replace with the IDs of the tags.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 37. **Change a Text Column**
+## 37. Change a Text Column
 
-This mutation sets a new value for a text column.
+**Description:** Set a new value for a text column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
-  change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"text8__1\": \"Sample text\"}"
+  change_simple_column_value(
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_id: "{{ text_column_id }}",
+    value: "{{ text_value }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ text_column_id }}`**: Replace with the ID of the text column.
+- **`{{ text_value }}`**: Replace with the new text content.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
-    "change_multiple_column_values": {
-      "id": "1711043053"
+    "change_simple_column_value": {
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 38. **Change a Timeline Column**
+## 38. Change a Timeline Column
 
-This mutation updates a timeline column with start and end dates.
+**Description:** Update a timeline column with start and end dates.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"timeline__1\": {\"from\": \"2019-06-03\", \"to\": \"2019-06-07\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ timeline_column_id }}\": {\"from\": \"{{ start_date }}\", \"to\": \"{{ end_date }}\"}}"
+```
+
+- **`{{ timeline_column_id }}`**: Replace with the ID of the timeline column.
+- **`{{ start_date }}`**, **`{{ end_date }}`**: Replace with dates in `YYYY-MM-DD` format.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 39. **Change a Week Column**
+## 39. Change a Week Column
 
-This mutation sets the start and end dates for a week column.
+**Description:** Set the start and end dates for a week column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"week__1\": {\"week\": {\"startDate\": \"2019-06-10\", \"endDate\": \"2019-06-16\"}}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ week_column_id }}\": {\"week\": {\"startDate\": \"{{ start_date }}\", \"endDate\": \"{{ end_date }}\"}}}"
+```
+
+- **`{{ week_column_id }}`**: Replace with the ID of the week column.
+- **`{{ start_date }}`**, **`{{ end_date }}`**: Replace with dates in `YYYY-MM-DD` format.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 40. **Change a World Clock Column**
+## 40. Change a World Clock Column
 
-This mutation updates the timezone for a world clock column.
+**Description:** Update the timezone for a world clock column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"world_clock__1\": {\"timezone\": \"Europe/London\"}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{{ column_values_json }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_values_json }}`**: Use the following JSON string:
+
+```json
+"{\"{{ world_clock_column_id }}\": {\"timezone\": \"{{ timezone }}\"}}"
+```
+
+- **`{{ world_clock_column_id }}`**: Replace with the ID of the world clock column.
+- **`{{ timezone }}`**: Replace with the timezone identifier (e.g., "Europe/London").
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
-  },
-  "account_id": 25228442
+  }
 }
 ```
+
 ---
 
-### 41. **Clear a Text Column**
+## 41. Clear a Text Column
 
-This mutation clears the content of a text column by setting its value to an empty string.
+**Description:** Clear the content of a text column by setting its value to an empty string.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"text8__1\": \"\"}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{\"{{ text_column_id }}\": \"\"}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id }}`**: Replace with the ID of the item.
+- **`{{ board_id }}`**: Replace with the ID of the board.
+- **`{{ text_column_id }}`**: Replace with the ID of the text column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 42. **Clear a Numbers Column**
+## 42. Clear a Numbers Column
 
-This mutation clears the value of a numbers column by setting it to an empty string.
+**Description:** Clear the value of a numbers column by setting it to an empty string.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"numbers__1\": \"\"}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{\"{{ numbers_column_id }}\": \"\"}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ numbers_column_id }}`**: Replace with the ID of the numbers column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 43. **Clear a Files Column**
+## 43. Clear a Files Column
 
-This mutation clears all files in a files column.
+**Description:** Clear all files in a files column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_column_value(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_id: "files__1",
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_id: "{{ files_column_id }}",
     value: "{\"clear_all\": true}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ files_column_id }}`**: Replace with the ID of the files column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_column_value": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 44. **Clear a Connect Boards Column**
+## 44. Clear a Connect Boards Column
 
-This mutation clears all connected items in a connect boards column.
+**Description:** Clear all connected items in a connect boards column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"connect_boards__1\": {}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{\"{{ connect_boards_column_id }}\": {}}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ connect_boards_column_id }}`**: Replace with the ID of the connect boards column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 45. Clear a Dependency Column
 
+**Description:** Clear a dependency column by removing all linked dependencies.
 
-### 45. **Clear a Dependency Column**
+### **Mutation Template**
 
-This mutation clears a dependency column by removing all linked dependencies.
-
-#### Mutation
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"dependency__1\": {}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{\"{{ dependency_column_id }}\": {}}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ dependency_column_id }}`**: Replace with the ID of the dependency column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 46. **Clear a Status Column**
+## 46. Clear a Status Column
 
-This mutation clears a status column by removing the assigned label.
+**Description:** Clear a status column by removing the assigned label.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_multiple_column_values(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_values: "{\"status_1__1\": {}}"
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_values: "{\"{{ status_column_id }}\": {}}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ status_column_id }}`**: Replace with the ID of the status column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_multiple_column_values": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 47. **Clear a People Column**
+## 47. Clear a People Column
 
-This mutation clears all people or teams assigned in a people column.
+**Description:** Clear all people or teams assigned in a people column.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_column_value(
-    item_id: 1711043053,
-    board_id: 1614669298,
-    column_id: "people__1",
+    item_id: {{ item_id }},
+    board_id: {{ board_id }},
+    column_id: "{{ people_column_id }}",
     value: "{\"clear_all\": true}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ people_column_id }}`**: Replace with the ID of the people column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_column_value": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 48. Get Specific Values in Column Values for a Location Column
 
-### 48. **Get Specific Values in Column Values for a Location Column**
+**Description:** Retrieve specific details within a location column, such as country, street, and street number.
 
-This query retrieves specific details within a location column, such as country, street, and street number.
+### **Query Template**
 
-#### Query
 ```graphql
 query {
-  items(ids: [1234567890, 9876543210]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on LocationValue {
         country
@@ -1547,7 +2192,13 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the IDs of the items you want to query.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -1555,32 +2206,37 @@ query {
       {
         "column_values": [
           {
-            "country": "United States",
-            "street": "Broadway",
-            "street_number": "123"
-          },
+            "country": "{{ country1 }}",
+            "street": "{{ street1 }}",
+            "street_number": "{{ street_number1 }}"
+          }
+        ]
+      },
+      {
+        "column_values": [
           {
-            "country": "Canada",
-            "street": "King Street",
-            "street_number": "456"
+            "country": "{{ country2 }}",
+            "street": "{{ street2 }}",
+            "street_number": "{{ street_number2 }}"
           }
         ]
       }
     ]
   }
 }
-
 ```
+
 ---
 
-### 49. **Get Specific Values in Column Values for a Status Column**
+## 49. Get Specific Values in Column Values for a Status Column
 
-This query fetches detailed information in a status column, including label and update ID.
+**Description:** Fetch detailed information in a status column, including label and update ID.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: 1711043053) {
+  items(ids: {{ item_id }}) {
     column_values {
       value
       type
@@ -1592,7 +2248,13 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id }}`**: Replace with the ID of the item you want to query.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -1600,149 +2262,31 @@ query {
       {
         "column_values": [
           {
-            "value": null,
-            "type": "subtasks"
-          },
-          {
-            "value": null,
-            "type": "people"
-          },
-          {
-            "value": null,
-            "type": "status",
-            "label": null,
-            "update_id": null
-          },
-          {
-            "value": null,
-            "type": "text"
-          },
-          {
-            "value": null,
-            "type": "text"
-          },
-          {
-            "value": "{\"item_id\":\"1711043053\"}",
-            "type": "item_id"
-          },
-          {
-            "value": null,
-            "type": "status",
-            "label": null,
-            "update_id": null
-          },
-          {
-            "value": "{\"checked\":false}",
-            "type": "checkbox"
-          },
-          {
-            "value": null,
-            "type": "board_relation"
-          },
-          {
-            "value": null,
-            "type": "country"
-          },
-          {
-            "value": null,
-            "type": "date"
-          },
-          {
-            "value": null,
-            "type": "dropdown"
-          },
-          {
-            "value": null,
-            "type": "email"
-          },
-          {
-            "value": "{\"item_id\":\"1711043053\"}",
-            "type": "item_id"
-          },
-          {
-            "value": "{\"hour\":16,\"minute\":42,\"changed_at\":\"2024-11-19T13:35:32.849Z\"}",
-            "type": "hour"
-          },
-          {
-            "value": "\"\"",
-            "type": "text"
-          },
-          {
-            "value": "{\"url\":\"http://monday.com\",\"text\":\"go to monday!\",\"changed_at\":\"2024-11-19T13:39:48.292Z\"}",
-            "type": "link"
-          },
-          {
-            "value": "{\"lat\":\"29.9772962\",\"lng\":\"31.1324955\",\"address\":\"Giza Pyramid Complex\",\"changed_at\":\"2024-11-19T13:41:27.913Z\"}",
-            "type": "location"
-          },
-          {
-            "value": "{\"text\":\"Sample text\",\"changed_at\":\"2024-11-19T13:43:36.060Z\"}",
-            "type": "long_text"
-          },
-          {
-            "value": "\"\"",
-            "type": "numbers"
-          },
-          {
-            "value": null,
-            "type": "people"
-          },
-          {
-            "value": "{\"phone\":\"11231234567\",\"changed_at\":\"2024-11-19T13:48:30.138Z\",\"countryShortName\":\"US\"}",
-            "type": "phone"
-          },
-          {
-            "value": "{\"rating\":5,\"changed_at\":\"2024-11-19T13:50:47.818Z\"}",
-            "type": "rating"
-          },
-          {
-            "value": "{\"changed_at\":\"2024-11-20T05:32:53.428Z\"}",
-            "type": "status",
-            "label": null,
-            "update_id": null
-          },
-          {
-            "value": "{\"tag_ids\":[295026,295064]}",
-            "type": "tags"
-          },
-          {
-            "value": "{\"to\":\"2019-06-07\",\"from\":\"2019-06-03\",\"changed_at\":\"2024-11-19T13:58:44.781Z\"}",
-            "type": "timeline"
-          },
-          {
-            "value": "{\"week\":{\"endDate\":\"2019-06-16\",\"startDate\":\"2019-06-10\"}}",
-            "type": "week"
-          },
-          {
-            "value": "{\"timezone\":\"Europe/London\",\"changed_at\":\"2024-11-20T05:19:30.213Z\"}",
-            "type": "world_clock"
-          },
-          {
-            "value": "{\"files\":[]}",
-            "type": "file"
-          },
-          {
-            "value": null,
-            "type": "dependency"
+            "value": "{{ value }}",
+            "type": "{{ type }}",
+            "label": "{{ label }}",
+            "update_id": "{{ update_id }}"
           }
+          // Additional column values...
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 50. Get Specific Values in Column Values for a Checkbox Column
 
-### 50. **Get Specific Values in Column Values for a Checkbox Column**
+**Description:** Retrieve the checked status and the last updated time of a checkbox column.
 
-This query retrieves the checked status and the last updated time of a checkbox column.
+### **Query Template**
 
-#### Query
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on CheckboxValue {
         checked
@@ -1752,7 +2296,13 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the IDs of the items you want to query.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -1760,84 +2310,124 @@ query {
       {
         "column_values": [
           {
-            "checked": false,
-            "updated_at": null
+            "checked": {{ checked1 }},
+            "updated_at": "{{ updated_at1 }}"
           }
         ]
       },
       {
         "column_values": [
           {
-            "checked": true,
-            "updated_at": "2024-11-24T12:00:00Z"
+            "checked": {{ checked2 }},
+            "updated_at": "{{ updated_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
-### 51. **Get Specific Values in Column Values for a Connect Boards Column**
 
-This query fetches details from a connect boards column, such as linked item IDs and the linked items themselves.
+## 51. Get Specific Values in Column Values for a Connect Boards Column
 
-#### Query
+**Description:** Fetch details from a connect boards column, such as linked item IDs and the linked items themselves.
+
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1234567890, 9876543210]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on BoardRelationValue {
         linked_item_ids
-        linked_items
+        linked_items {
+          id
+          name
+        }
       }
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the IDs of the items you want to query.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
+    "items": [
       {
-        "id": "1234567890",
-        "name": "Board Name"
+        "column_values": [
+          {
+            "linked_item_ids": [{{ linked_item_id1 }}, {{ linked_item_id2 }}],
+            "linked_items": [
+              {
+                "id": "{{ linked_item_id1 }}",
+                "name": "{{ linked_item_name1 }}"
+              },
+              {
+                "id": "{{ linked_item_id2 }}",
+                "name": "{{ linked_item_name2 }}"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "column_values": [
+          {
+            "linked_item_ids": [{{ linked_item_id3 }}],
+            "linked_items": [
+              {
+                "id": "{{ linked_item_id3 }}",
+                "name": "{{ linked_item_name3 }}"
+              }
+            ]
+          }
+        ]
       }
     ]
-  }
+  },
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 52. Get Specific Values in Column Values for a Country Column
 
-### 52. **Get Specific Values in Column Values for a Country Column**
+**Description:** Retrieve country details and the last update time for a country column.
 
-This query retrieves country details and the last update time for a country column.
+### **Query Template**
 
-#### Query
 ```graphql
 query {
-  items(ids: [1234567890, 9876543210]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on CountryValue {
         country
+        country_code
         updated_at
       }
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the IDs of the items you want to query.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -1845,79 +2435,94 @@ query {
       {
         "column_values": [
           {
-            "country": "United States",
-            "updated_at": "2024-11-25T12:00:00Z"
+            "country": "{{ country_name1 }}",
+            "country_code": "{{ country_code1 }}",
+            "updated_at": "{{ updated_at1 }}"
           }
         ]
       },
       {
         "column_values": [
           {
-            "country": "Canada",
-            "updated_at": "2024-11-24T15:30:00Z"
-          }
-        ]
-      }
-    ]
-  }
-}
-
-```
-
-### 53. **Get Specific Values in Column Values for a Date Column**
-
-This query retrieves date and time details from a date column.
-
-#### Query
-```graphql
-query {
-  items(ids: [1655422739, 1655422742]) {
-    column_values {
-      ... on DateValue {
-        time
-        date
-      }
-    }
-  }
-}
-```
-#### Response Template
-```json
-{
-  "data": {
-    "items": [
-      {
-        "column_values": [
-          {
-            "time": "23:00",
-            "date": "1993-08-27"
-          }
-        ]
-      },
-      {
-        "column_values": [
-          {
-            "time": "",
-            "date": ""
+            "country": "{{ country_name2 }}",
+            "country_code": "{{ country_code2 }}",
+            "updated_at": "{{ updated_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
-### 54. **Get Specific Values in Column Values for a Dependency Column**
+## 53. Get Specific Values in Column Values for a Date Column
 
-This query fetches linked item IDs and the last updated time for a dependency column.
+**Description:** Retrieve date and time details from a date column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1655422739, 9876543210]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
+    column_values {
+      ... on DateValue {
+        date
+        time
+        changed_at
+      }
+    }
+  }
+}
+```
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
+```json
+{
+  "data": {
+    "items": [
+      {
+        "column_values": [
+          {
+            "date": "{{ date1 }}",
+            "time": "{{ time1 }}",
+            "changed_at": "{{ changed_at1 }}"
+          }
+        ]
+      },
+      {
+        "column_values": [
+          {
+            "date": "{{ date2 }}",
+            "time": "{{ time2 }}",
+            "changed_at": "{{ changed_at2 }}"
+          }
+        ]
+      }
+    ]
+  },
+  "account_id": {{ account_id }}
+}
+```
+
+---
+
+## 54. Get Specific Values in Column Values for a Dependency Column
+
+**Description:** Fetch linked item IDs and the last updated time for a dependency column.
+
+### **Query Template**
+
+```graphql
+query {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on DependencyValue {
         linked_item_ids
@@ -1927,7 +2532,13 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -1935,106 +2546,58 @@ query {
       {
         "column_values": [
           {
-            "linked_item_ids": [987654321, 123456789],
-            "updated_at": "2024-11-25T12:00:00Z"
+            "linked_item_ids": [{{ linked_item_id1 }}, {{ linked_item_id2 }}],
+            "updated_at": "{{ updated_at1 }}"
           }
         ]
       },
       {
         "column_values": [
           {
-            "linked_item_ids": [1122334455],
-            "updated_at": "2024-11-24T15:30:00Z"
+            "linked_item_ids": [{{ linked_item_id3 }}],
+            "updated_at": "{{ updated_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
-### 55. **Get Specific Values in Column Values for a Dropdown Column**
+## 55. Get Specific Values in Column Values for a Dropdown Column
 
-This query retrieves values and column details for a dropdown column.
+**Description:** Retrieve selected values and column details for a dropdown column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1655422739, 1655422742]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on DropdownValue {
         values {
           id
+          name
         }
         column {
           id
         }
-      }
-    }
-  }
-}
-```
-#### Response Template
-```json
-{
-  "data": {
-    "items": [
-      {
-        "column_values": [
-          {
-            "values": [
-              {
-                "id": "0"
-              },
-              {
-                "id": "1"
-              }
-            ],
-            "column": {
-              "id": "dropdown__1"
-            }
-          }
-        ]
-      },
-      {
-        "column_values": [
-          {
-            "values": [],
-            "column": {
-              "id": "dropdown__1"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  "account_id": 25228442
-}
-
-```
----
-
-### 56. **Get Specific Values in Column Values for an Email Column**
-
-This query retrieves the email address and last update time for an email column.
-
-#### Query
-```graphql
-query {
-  items(ids: [1655422739, 1711043053]) {
-    column_values {
-      ... on EmailValue {
-        email
         updated_at
       }
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -2044,15 +2607,18 @@ query {
           {
             "values": [
               {
-                "id": "0"
+                "id": "{{ option_id1 }}",
+                "name": "{{ option_name1 }}"
               },
               {
-                "id": "1"
+                "id": "{{ option_id2 }}",
+                "name": "{{ option_name2 }}"
               }
             ],
             "column": {
-              "id": "dropdown__1"
-            }
+              "id": "{{ dropdown_column_id }}"
+            },
+            "updated_at": "{{ updated_at1 }}"
           }
         ]
       },
@@ -2061,37 +2627,46 @@ query {
           {
             "values": [],
             "column": {
-              "id": "dropdown__1"
-            }
+              "id": "{{ dropdown_column_id }}"
+            },
+            "updated_at": "{{ updated_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
-### 57. **Get Specific Values in Column Values for an Hour Column**
+## 56. Get Specific Values in Column Values for an Email Column
 
-This query fetches the hour and minute values from an hour column.
+**Description:** Retrieve the email address and last update time for an email column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
-      ... on HourValue {
-        minute
-        hour
+      ... on EmailValue {
+        email
+        text
+        updated_at
       }
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -2099,45 +2674,111 @@ query {
       {
         "column_values": [
           {
-            "email": "example@example.com",
-            "updated_at": "2024-11-19T13:32:57+00:00"
+            "email": "{{ email1 }}",
+            "text": "{{ text1 }}",
+            "updated_at": "{{ updated_at1 }}"
           }
         ]
       },
       {
         "column_values": [
           {
-            "email": null,
-            "updated_at": null
+            "email": "{{ email2 }}",
+            "text": "{{ text2 }}",
+            "updated_at": "{{ updated_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
-### 58. **Get Specific Values in Column Values for a Link Column**
+## 57. Get Specific Values in Column Values for an Hour Column
 
-This query retrieves the URL and display text from a link column.
+**Description:** Fetch the hour and minute values from an hour column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1655422739, 1711043053]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
+    column_values {
+      ... on HourValue {
+        hour
+        minute
+        changed_at
+      }
+    }
+  }
+}
+```
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
+```json
+{
+  "data": {
+    "items": [
+      {
+        "column_values": [
+          {
+            "hour": {{ hour1 }},
+            "minute": {{ minute1 }},
+            "changed_at": "{{ changed_at1 }}"
+          }
+        ]
+      },
+      {
+        "column_values": [
+          {
+            "hour": {{ hour2 }},
+            "minute": {{ minute2 }},
+            "changed_at": "{{ changed_at2 }}"
+          }
+        ]
+      }
+    ]
+  },
+  "account_id": {{ account_id }}
+}
+```
+
+---
+
+## 58. Get Specific Values in Column Values for a Link Column
+
+**Description:** Retrieve the URL and display text from a link column.
+
+### **Query Template**
+
+```graphql
+query {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on LinkValue {
         url
-        url_text
+        text
+        changed_at
       }
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -2145,48 +2786,55 @@ query {
       {
         "column_values": [
           {
-            "url": null,
-            "url_text": null
+            "url": "{{ url1 }}",
+            "text": "{{ text1 }}",
+            "changed_at": "{{ changed_at1 }}"
           }
         ]
       },
       {
         "column_values": [
           {
-            "url": "http://monday.com",
-            "url_text": "go to monday!"
+            "url": "{{ url2 }}",
+            "text": "{{ text2 }}",
+            "changed_at": "{{ changed_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
+## 59. Get Specific Values in Column Values for a Long Text Column
 
+**Description:** Retrieve the text content and value from a long text column.
 
+### **Query Template**
 
-### 59. **Get Specific Values in Column Values for a Long Text Column**
-
-This query retrieves the text content and value from a long text column.
-
-#### Query
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on LongTextValue {
         text
         value
+        updated_at
       }
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -2194,47 +2842,60 @@ query {
       {
         "column_values": [
           {
-            "text": "",
-            "value": null
+            "text": "{{ text_content1 }}",
+            "value": "{{ value1 }}",
+            "updated_at": "{{ updated_at1 }}"
           }
         ]
       },
       {
         "column_values": [
           {
-            "text": "Sample text",
-            "value": "{\"text\":\"Sample text\",\"changed_at\":\"2024-11-19T13:43:36.060Z\"}"
+            "text": "{{ text_content2 }}",
+            "value": "{{ value2 }}",
+            "updated_at": "{{ updated_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
-### 60. **Get Specific Values in Column Values for a Monday Doc Column**
+## 60. Get Specific Values in Column Values for a Monday Doc Column
 
-This query retrieves file information from a Monday Doc column.
+**Description:** Retrieve file information from a Monday Doc column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1655422739, 1711043053]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on DocValue {
         file {
-          creator_id
+          id
+          name
           url
+          created_at
+          file_extension
         }
+        updated_at
       }
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
@@ -2243,9 +2904,13 @@ query {
         "column_values": [
           {
             "file": {
-              "creator_id": "12345",
-              "url": "https://example.com/file.pdf"
-            }
+              "id": "{{ file_id1 }}",
+              "name": "{{ file_name1 }}",
+              "url": "{{ file_url1 }}",
+              "created_at": "{{ created_at1 }}",
+              "file_extension": "{{ file_extension1 }}"
+            },
+            "updated_at": "{{ updated_at1 }}"
           }
         ]
       },
@@ -2253,28 +2918,33 @@ query {
         "column_values": [
           {
             "file": {
-              "creator_id": "67890",
-              "url": "https://example.com/another_file.pdf"
-            }
+              "id": "{{ file_id2 }}",
+              "name": "{{ file_name2 }}",
+              "url": "{{ file_url2 }}",
+              "created_at": "{{ created_at2 }}",
+              "file_extension": "{{ file_extension2 }}"
+            },
+            "updated_at": "{{ updated_at2 }}"
           }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
-
 ```
+
 ---
 
-### 61. **Get Specific Values in Column Values for a Numbers Column**
+## 61. Get Specific Values in Column Values for a Numbers Column
 
-This query retrieves the numeric value and ID from a numbers column.
+**Description:** Retrieve the numeric value and ID from a numbers column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on NumbersValue {
         number
@@ -2284,100 +2954,50 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the IDs of the items you want to query.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "number": null,
-            "id": "numbers__1"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "number": {{ number_value1 }},
+            "id": "{{ numbers_column_id }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "number": 0,
-            "id": "numbers__1"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "number": {{ number_value2 }},
+            "id": "{{ numbers_column_id }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 62. **Get Specific Values in Column Values for a People Column**
+## 62. Get Specific Values in Column Values for a People Column
 
-This query fetches information about persons and teams from a people column.
+**Description:** Fetch information about persons and teams from a people column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on PeopleValue {
         persons_and_teams {
@@ -2388,106 +3008,55 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
           {
             "persons_and_teams": [
               {
-                "id": "65548265"
+                "id": "{{ person_or_team_id1 }}"
+              },
+              {
+                "id": "{{ person_or_team_id2 }}"
               }
             ]
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {
-            "persons_and_teams": []
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       },
       {
         "column_values": [
-          {},
           {
             "persons_and_teams": []
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {
-            "persons_and_teams": []
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 63. **Get Specific Values in Column Values for a Phone Column**
+## 63. Get Specific Values in Column Values for a Phone Column
 
-This query retrieves the phone number and country code from a phone column.
+**Description:** Retrieve the phone number and country code from a phone column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on PhoneValue {
         country_short_name
@@ -2497,101 +3066,50 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "country_short_name": null,
-            "phone": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "country_short_name": "{{ country_code1 }}",
+            "phone": "{{ phone_number1 }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "country_short_name": "US",
-            "phone": "11231234567"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "country_short_name": "{{ country_code2 }}",
+            "phone": "{{ phone_number2 }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 64. Get Specific Values in Column Values for a Status Column
 
-### 64. **Get Specific Values in Column Values for a Status Column**
+**Description:** Retrieve the index and value of a status column.
 
-This query retrieves the index and value of a status column.
+### **Query Template**
 
-#### Query
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on StatusValue {
         index
@@ -2601,116 +3119,54 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
           {
-            "index": 3,
-            "value": "{\"index\":3}"
-          },
-          {},
-          {},
-          {},
-          {
-            "index": null,
-            "value": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {
-            "index": null,
-            "value": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "index": {{ status_index1 }},
+            "value": "{{ status_value1 }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
           {
-            "index": null,
-            "value": null
-          },
-          {},
-          {},
-          {},
-          {
-            "index": null,
-            "value": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {
-            "index": 1,
-            "value": "{\"index\":1,\"post_id\":null,\"changed_at\":\"2024-11-20T05:38:29.390Z\"}"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "index": {{ status_index2 }},
+            "value": "{{ status_value2 }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 65. **Using `items_page` with Query Parameters**
+## 65. Using `items_page` with Query Parameters
 
-This query retrieves items from a board with specific filters on column values. The `query_params` allows applying rules based on column IDs and values.
+**Description:** Retrieve items from a board with specific filters on column values using query parameters.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  boards(ids: 1614669298) {
+  boards(ids: {{ board_id }}) {
     items_page(
-      limit: 100,
+      limit: {{ limit }},
       query_params: {
-        rules: [{column_id: "text__1", compare_value: "task name"}],
+        rules: [{ column_id: "{{ column_id }}", compare_value: "{{ compare_value }}" }],
         operator: and
       }
     ) {
@@ -2723,34 +3179,51 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ board_id }}`**: Replace with the board ID.
+- **`{{ limit }}`**: Replace with the number of items to retrieve.
+- **`{{ column_id }}`**: Replace with the column ID to filter on.
+- **`{{ compare_value }}`**: Replace with the value to compare.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "boards": [
       {
         "items_page": {
-          "cursor": null,
-          "items": []
+          "cursor": "{{ next_cursor }}",
+          "items": [
+            {
+              "id": "{{ item_id1 }}",
+              "name": "{{ item_name1 }}"
+            },
+            // Additional items...
+          ]
         }
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
-### error
-### 66. **Using `next_items_page`**
 
-This query fetches the next set of items based on a cursor for pagination.
+## 66. Using `next_items_page`
 
-#### Query
+**Description:** Fetch the next set of items based on a cursor for pagination.
+
+### **Query Template**
+
 ```graphql
 query {
   next_items_page(
-    limit: 50,
-    cursor: "MSw5NzI4MDA5MDAsaV9YcmxJb0p1VEdYc1VWeGlxeF9kLDg4MiwzNXw0MTQ1NzU1MTE5"
+    limit: {{ limit }},
+    cursor: "{{ cursor }}"
   ) {
     cursor
     items {
@@ -2760,36 +3233,44 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ limit }}`**: Number of items to retrieve.
+- **`{{ cursor }}`**: The cursor obtained from the previous `items_page` or `next_items_page` call.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
-      {
-        "id": "1234567890",
-        "name": "Board Name"
-      }
-    ]
-  }
+    "next_items_page": {
+      "cursor": "{{ next_cursor }}",
+      "items": [
+        {
+          "id": "{{ item_id1 }}",
+          "name": "{{ item_name1 }}"
+        },
+        // Additional items...
+      ]
+    }
+  },
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 67. **Using `items_page`**
+## 67. Using `items_page`
 
-This query retrieves a paginated set of items from a board, limited to a specified number of items.
+**Description:** Retrieve a paginated set of items from a board.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  boards(ids: 1614669298) {
-    items_page(limit: 100) {
+  boards(ids: {{ board_id }}) {
+    items_page(limit: {{ limit }}) {
       cursor
       items {
         id
@@ -2799,66 +3280,52 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ board_id }}`**: Replace with the board ID.
+- **`{{ limit }}`**: Number of items to retrieve.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "boards": [
       {
         "items_page": {
-          "cursor": null,
+          "cursor": "{{ next_cursor }}",
           "items": [
             {
-              "id": "1711043053",
-              "name": "sample"
+              "id": "{{ item_id1 }}",
+              "name": "{{ item_name1 }}"
             },
-            {
-              "id": "1655422739",
-              "name": "chatgpt project"
-            },
-            {
-              "id": "1655422742",
-              "name": "make trigger for code"
-            },
-            {
-              "id": "1655423449",
-              "name": "update monday.com"
-            },
-            {
-              "id": "1710752117",
-              "name": "new item"
-            },
-            {
-              "id": "1710782705",
-              "name": "new item"
-            },
-            {
-              "id": "1710794933",
-              "name": "Task for Project"
-            }
+            // Additional items...
           ]
         }
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 68. **Using `items_page_by_column_values`**
+## 68. Using `items_page_by_column_values`
 
-This query retrieves items from a board that match specific column values, allowing filtering by multiple columns.
+**Description:** Retrieve items from a board that match specific column values.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
   items_page_by_column_values(
-    limit: 50,
-    board_id: 1614669298,
+    limit: {{ limit }},
+    board_id: {{ board_id }},
     columns: [
-      {column_id: "text__1", column_values: ["Some text"]},
-      {column_id: "country__1", column_values: ["US", "IL"]}
+      { column_id: "{{ column_id1 }}", column_values: ["{{ value1 }}", "{{ value2 }}"] },
+      { column_id: "{{ column_id2 }}", column_values: ["{{ value3 }}"] }
     ]
   ) {
     cursor
@@ -2869,131 +3336,171 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ limit }}`**: Number of items to retrieve.
+- **`{{ board_id }}`**: Replace with the board ID.
+- **`{{ column_id1 }}`, `{{ column_id2 }}`**: Column IDs to filter on.
+- **`{{ value1 }}`, `{{ value2 }}`, `{{ value3 }}`**: Values to match in the columns.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items_page_by_column_values": {
-      "cursor": null,
+      "cursor": "{{ next_cursor }}",
       "items": [
         {
-          "id": "1655422739",
-          "name": "chatgpt project"
-        }
+          "id": "{{ item_id1 }}",
+          "name": "{{ item_name1 }}"
+        },
+        // Additional items...
       ]
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 69. **Move an Item to a Different Board**
+## 69. Move an Item to a Different Board
 
-This mutation moves an item to a specified board and group.
+**Description:** Move an item to a specified board and group.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   move_item_to_board(
-    board_id: 1614669298,
-    group_id: "topics",
-    item_id: 1711043053
+    item_id: {{ item_id }},
+    board_id: {{ target_board_id }},
+    group_id: "{{ target_group_id }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id }}`**: ID of the item to move.
+- **`{{ target_board_id }}`**: ID of the board to move the item to.
+- **`{{ target_group_id }}`**: ID of the group within the target board.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "move_item_to_board": {
-      "id": "1711043053"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
-### error
-### 70. **Get Items Linked to a Specific Item**
 
-This query retrieves items that are linked to a specified item through a connect boards column.
+## 70. Get Items Linked to a Specific Item
 
-#### Query
+**Description:** Retrieve items that are linked to a specified item through a connect boards column.
+
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: 1234567890) {
+  items(ids: {{ item_id }}) {
     linked_items(
-      linked_board_id: 1122334455,
-      link_to_item_column_id: "connect_boards"
+      linked_board_id: {{ linked_board_id }},
+      link_to_item_column_id: "{{ connect_boards_column_id }}"
     ) {
       id
+      name
     }
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id }}`**: ID of the item whose linked items you want to retrieve.
+- **`{{ linked_board_id }}`**: ID of the linked board.
+- **`{{ connect_boards_column_id }}`**: ID of the connect boards column.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
-    "complexity": {
-      "before": 0,
-      "query": 0,
-      "after": 0,
-      "reset_in_x_seconds": 0
-    },
-    "boards": [
+    "items": [
       {
-        "id": "1234567890",
-        "name": "Board Name"
+        "linked_items": [
+          {
+            "id": "{{ linked_item_id1 }}",
+            "name": "{{ linked_item_name1 }}"
+          },
+          // Additional linked items...
+        ]
       }
     ]
-  }
+  },
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 71. **Clear Column Values**
+## 71. Clear Column Values
 
-This mutation clears the value of a specific column by setting it to `null`.
+**Description:** Clear the value of a specific column by setting it to `null`.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   change_simple_column_value(
-    board_id: 1614669298,
-    item_id: 1655422739,
-    column_id: "date__1",
+    board_id: {{ board_id }},
+    item_id: {{ item_id }},
+    column_id: "{{ column_id }}",
     value: null
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ column_id }}`**: Replace with the ID of the column you want to clear.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "change_simple_column_value": {
-      "id": "1655422739"
+      "id": "{{ item_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 72. Get Specific Values in Column Values for a Rating Column
 
-### 72. **Get Specific Values in Column Values for a Rating Column**
+**Description:** Retrieve the rating value and last updated time for a rating column.
 
-This query retrieves the rating value and last updated time for a rating column.
+### **Query Template**
 
-#### Query
 ```graphql
 query {
-  items(ids: [1711043053, 1710794933]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on RatingValue {
         rating
@@ -3003,100 +3510,50 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "rating": 2,
-            "updated_at": "2024-11-20T16:12:52+00:00"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "rating": {{ rating_value1 }},
+            "updated_at": "{{ updated_at1 }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "rating": 5,
-            "updated_at": "2024-11-19T13:50:47+00:00"
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "rating": {{ rating_value2 }},
+            "updated_at": "{{ updated_at2 }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 73. **Get Specific Values in Column Values for a Tags Column**
+## 73. Get Specific Values in Column Values for a Tags Column
 
-This query retrieves tag IDs and associated text from a tags column.
+**Description:** Retrieve tag IDs and associated text from a tags column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1710794933, 1711043053]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on TagsValue {
         tag_ids
@@ -3106,105 +3563,50 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "tag_ids": [
-              5135281
-            ],
-            "text": "one"
-          },
-          {},
-          {},
-          {},
-          {},
-          {}
+            "tag_ids": [{{ tag_id1 }}, {{ tag_id2 }}],
+            "text": "{{ tags_text1 }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "tag_ids": [
-              295026,
-              295064
-            ],
-            "text": ""
-          },
-          {},
-          {},
-          {},
-          {},
-          {}
+            "tag_ids": [{{ tag_id3 }}],
+            "text": "{{ tags_text2 }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 74. **Get Specific Values in Column Values for a Text Column**
+## 74. Get Specific Values in Column Values for a Text Column
 
-This query retrieves the text content and value from a text column.
+**Description:** Retrieve the text content and value from a text column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1711043053, 1655422739]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on TextValue {
         text
@@ -3214,112 +3616,50 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
           {
-            "text": "Some text",
-            "value": "\"Some text\""
-          },
-          {
-            "text": "",
-            "value": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {
-            "text": "",
-            "value": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "text": "{{ text_content1 }}",
+            "value": "{{ text_value1 }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
           {
-            "text": "",
-            "value": null
-          },
-          {
-            "text": "",
-            "value": null
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {
-            "text": "",
-            "value": "\"\""
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {}
+            "text": "{{ text_content2 }}",
+            "value": "{{ text_value2 }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 75. **Get Specific Values in Column Values for a Timeline Column**
+## 75. Get Specific Values in Column Values for a Timeline Column
 
-This query retrieves the start and end dates of a timeline column.
+**Description:** Retrieve the start and end dates of a timeline column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1655422739, 1711043053]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on TimelineValue {
         from
@@ -3329,100 +3669,50 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "from": null,
-            "to": null
-          },
-          {},
-          {},
-          {},
-          {}
+            "from": "{{ start_date1 }}",
+            "to": "{{ end_date1 }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "from": "2019-06-03T00:00:00+00:00",
-            "to": "2019-06-07T00:00:00+00:00"
-          },
-          {},
-          {},
-          {},
-          {}
+            "from": "{{ start_date2 }}",
+            "to": "{{ end_date2 }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 76. **Get Specific Values in Column Values for a Week Column**
+## 76. Get Specific Values in Column Values for a Week Column
 
-This query retrieves the start and end dates of a week column.
+**Description:** Retrieve the start and end dates of a week column.
 
-#### Query
+### **Query Template**
+
 ```graphql
 query {
-  items(ids: [1655422739, 1711043053]) {
+  items(ids: [{{ item_id1 }}, {{ item_id2 }}]) {
     column_values {
       ... on WeekValue {
         start_date
@@ -3432,171 +3722,168 @@ query {
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id1 }}`, `{{ item_id2 }}`**: Replace with the item IDs.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "items": [
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "start_date": null,
-            "end_date": null
-          },
-          {},
-          {},
-          {}
+            "start_date": "{{ start_date1 }}",
+            "end_date": "{{ end_date1 }}"
+          }
         ]
       },
       {
         "column_values": [
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {
-            "start_date": "2019-06-10T00:00:00+00:00",
-            "end_date": "2019-06-16T00:00:00+00:00"
-          },
-          {},
-          {},
-          {}
+            "start_date": "{{ start_date2 }}",
+            "end_date": "{{ end_date2 }}"
+          }
         ]
       }
     ]
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
+## 77. Create a Tag
 
-### 77. **Create a Tag**
+**Description:** Create a new tag or retrieve an existing tag with the specified name.
 
-This mutation creates a new tag or retrieves an existing tag with the specified name.
+### **Mutation Template**
 
-#### Mutation
 ```graphql
 mutation {
-  create_or_get_tag(tag_name: "one") {
+  create_or_get_tag(tag_name: "{{ tag_name }}") {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ tag_name }}`**: Replace with the name of the tag.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_or_get_tag": {
-      "id": "5135281"
+      "id": "{{ tag_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 78. **Create an Update**
+## 78. Create an Update
 
-This mutation creates an update attached to a specified item, allowing you to add notes or status updates.
+**Description:** Create an update attached to a specified item.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   create_update(
-    item_id: 1710794933,
-    body: "This update will be added to the item"
+    item_id: {{ item_id }},
+    body: "{{ update_body }}"
   ) {
     id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ item_id }}`**: ID of the item to attach the update to.
+- **`{{ update_body }}`**: Content of the update.
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
     "create_update": {
-      "id": "349485151"
+      "id": "{{ update_id }}"
     }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
 
-### 79. **Create a Webhook**
+## 79. Create a Webhook
 
-This mutation sets up a webhook to monitor events on a specified board. The example below sets a webhook for status column changes.
+**Description:** Set up a webhook to monitor events on a specified board.
 
-#### Mutation
+### **Mutation Template**
+
 ```graphql
 mutation {
   create_webhook(
-    board_id: 1614669298,
-    url: "https://myendpoint.com/webhook",
-    event: change_status_column_value,
-    config: "{\"columnId\":\"status\", \"columnValue\":{\"$any$\":true}}"
+    board_id: {{ board_id }},
+    url: "{{ webhook_url }}",
+    event: {{ event_type }},
+    config: "{{ config_json }}"
   ) {
     id
     board_id
   }
 }
 ```
-#### Response Template
+
+**Instructions:**
+
+- **`{{ board_id }}`**: ID of the board to monitor.
+- **`{{ webhook_url }}`**: Endpoint URL for the webhook.
+- **`{{ event_type }}`**: Event to monitor (e.g., `change_column_value`).
+- **`{{ config_json }}`**: Configuration JSON string for the webhook.
+
+**Example Configuration for Status Column Changes:**
+
+```json
+"{\"columnId\":\"{{ status_column_id }}\", \"columnValue\":{\"$any$\":true}}"
+```
+
+### **Expected Response Structure**
+
 ```json
 {
   "data": {
-    "create_webhook": null
+    "create_webhook": {
+      "id": "{{ webhook_id }}",
+      "board_id": "{{ board_id }}"
+    }
   },
-  "account_id": 25228442
+  "account_id": {{ account_id }}
 }
 ```
+
 ---
+
+## General Notes
+
+- **IDs and Values**: Ensure all placeholders like `{{ item_id }}`, `{{ board_id }}`, `{{ column_id }}`, etc., are replaced with actual values from your Monday.com account.
+- **JSON Formatting**: When providing JSON values in mutations, ensure that the JSON string is properly escaped and formatted.
+- **Pagination**: When dealing with paginated queries like `items_page`, make sure to handle the `cursor` for fetching subsequent pages.
+- **Clearing Column Values**: To clear a column value, you can set it to `null`, an empty string `""`, or an empty object `{}`, depending on the column type.
+- **Error Handling**: Always check for errors in the response and handle them appropriately in your application.
+- **Official Documentation**: Consult the [Monday.com API documentation](https://api.developer.monday.com/docs) for the most up-to-date information on API capabilities and limitations.
+
+---
+
